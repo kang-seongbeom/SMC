@@ -30,33 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private int WRITE_REQUEST_CODE = 43;
     private ParcelFileDescriptor pfd;
     private FileOutputStream fileOutputStream;
-    public static final String topFile ="TopFile";
 
         @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button toOcr=findViewById(R.id.toOcr);
-
-        //내부저장소 파일 쓰기
-        FileOutputStream fos=null;
-        Context context=getApplicationContext();
-        try{
-            fos=openFileOutput(topFile, Context.MODE_PRIVATE);
-            fos.close();
-        }catch(FileNotFoundException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-
-        String folderPath=context.getFilesDir().toString()+"/"+"foder1";
-
-        File mkFoilderFile=new File(folderPath);
-
-        if(!mkFoilderFile.exists())
-            mkFoilderFile.mkdirs();
 
         toOcr.setOnClickListener(new View.OnClickListener() {
             @Override

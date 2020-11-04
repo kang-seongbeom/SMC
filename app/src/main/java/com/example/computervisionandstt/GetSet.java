@@ -1,7 +1,8 @@
 package com.example.computervisionandstt;
 
 public class GetSet {
-    String fileName,Contents;
+    String fileName, contents;
+
 
     public String getFileName() {
         return fileName;
@@ -12,10 +13,10 @@ public class GetSet {
     }
 
     public String getContents() {
-        return Contents;
+        return contents;
     }
 
     public void setContents(String contents) {
-        Contents = contents;
+        this.contents = contents;
     }
 }

@@ -7,7 +7,6 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,7 +21,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -33,7 +31,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,9 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class Ocr extends AppCompatActivity {
@@ -128,8 +123,8 @@ public class Ocr extends AppCompatActivity {
                     ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
                     final ByteArrayInputStream inputStream=new ByteArrayInputStream(outputStream.toByteArray());
-                    Ocr.ImageAnalytics imageAnalytics=new Ocr.ImageAnalytics();
-                    imageAnalytics.execute(inputStream);
+                    ImageAnalyticsAsyc imageAnalyticsAsyc=new ImageAnalyticsAsyc();
+                    imageAnalyticsAsyc.execute(inputStream);
                 }
             }
         });
@@ -169,13 +164,13 @@ public class Ocr extends AppCompatActivity {
                 alertDialog.setPositiveButton("저장", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        CheckTypesTask checkTypesTask=new CheckTypesTask();
+                        FileSaveAsyc fileSaveAsyc=new FileSaveAsyc();
                         String fileName=saveFileName.getText().toString();
                         String Contents=ocrImageToText.toString();
                         GetSet getSet=new GetSet();
                         getSet.setFileName(fileName);
                         getSet.setContents(Contents);
-                        checkTypesTask.execute((GetSet) getSet);
+                        fileSaveAsyc.execute((GetSet) getSet);
                     }
                 });
 
@@ -194,7 +189,7 @@ public class Ocr extends AppCompatActivity {
     }
 
     //이미지의 텍스트 추출
-    public class ImageAnalytics extends AsyncTask<InputStream,String,String> {
+    public class ImageAnalyticsAsyc extends AsyncTask<InputStream,String,String> {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Ocr.this);
         AlertDialog alertDialog;
         @Override
@@ -207,7 +202,6 @@ public class Ocr extends AppCompatActivity {
 
         @Override
         protected String doInBackground(InputStream... inputStreams) {
-
             try{
                 Log.d("doInBackground:","doInBackground");
                 OCR ocr=visionServiceRestClient.recognizeText(inputStreams[0], LanguageCodes.Korean,true);
@@ -239,7 +233,7 @@ public class Ocr extends AppCompatActivity {
     }
 
     //파일저장
-    private class CheckTypesTask extends AsyncTask<GetSet,Void,Void> {
+    private class FileSaveAsyc extends AsyncTask<GetSet,Void,Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -256,16 +250,31 @@ public class Ocr extends AppCompatActivity {
         protected Void doInBackground(GetSet... Received) {
 
             String receivedFileName=Received[0].fileName;
-            String receivedContents=Received[0].Contents;
+            String receivedContents=Received[0].contents;
+
+            Context context=getApplicationContext();
 
             //저장 할 파일 경로
-            String createFilePath= MainActivity.topFile+ "/"+ receivedFileName+"#"+getCurrentTime();
+            String folderPath=context.getFilesDir().toString()+"/"+receivedFileName+"#"+getCurrentTime();
+            File createFoilder=new File(folderPath);
+            if(!createFoilder.exists())
+                createFoilder.mkdirs();
             //저장시킬 파일 만들기
-            if(receivedFileName!=null) {
+
+            String ttsName = "TTStext.txt";
+            String imageName="image.jpg";
+
+            //TTS텍스트 저장
+            if(receivedContents!=null) {
                 FileOutputStream fos = null;
                 try {
-                    Context context=getApplicationContext();
-                    fos = context.openFileOutput(createFilePath, Context.MODE_PRIVATE);
+                    File tmpTextFile=new File(context.getFilesDir().toString(),ttsName);
+                    tmpTextFile.createNewFile();
+                    fos = new FileOutputStream(tmpTextFile);
+                    BufferedWriter mWriter = new BufferedWriter(new OutputStreamWriter(fos));
+                    mWriter.write(receivedContents);
+                    mWriter.flush();
+                    mWriter.close();
                     fos.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -274,38 +283,31 @@ public class Ocr extends AppCompatActivity {
                 }
             }
 
-            //STT텍스트 저장
-            if(receivedContents!=null) {
-                FileOutputStream mFos = null;
-                try {
-                    String ttsFilePath = createFilePath + "/" + "TTStext.txt";
-                    mFos = new FileOutputStream(ttsFilePath, true);
-                    BufferedWriter mWriter = new BufferedWriter(new OutputStreamWriter(mFos));
-                    mWriter.write(receivedContents);
-                    mWriter.flush();
-                    mWriter.close();
-                    mFos.close();
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+            //이미지 저장
+            if(cacheFilePath!=null){
+                FileOutputStream fos=null;
+                try{
+                    File tmpImageFile=new File(context.getFilesDir().toString(),imageName);
+                    tmpImageFile.createNewFile();
+                    fos=new FileOutputStream(tmpImageFile);
+                    Bitmap bitmap= BitmapFactory.decodeFile(cacheFilePath);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG,100,fos);
+                    fos.close();
+                }catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-            //publishProgress();
 
-            //내부 생성파일 존재 확인
-            File file=new File(createFilePath);
-            if(!file.exists()){
-                Log.d("fileexists",createFilePath);
-            }else{
-                Log.d("fileexists","nope");
-            }
-            //내부 생성파일 존재 확인
-            File file2=new File(createFilePath+"/"+"TTStext.txt");
-            if(!file2.exists()){
-                Log.d("ttsexists",createFilePath+"/"+"TTStext.txt");
-            }else{
-                Log.d("ttsexists","nope");
+            //경로 변경
+            if(createFoilder.exists()){
+                Log.d("TTSLog",context.getFilesDir().toString()+"/"+ttsName);
+                Log.d("TTSLog",folderPath+"/"+"TTStext.txt");
+                Log.d("ImageLog",context.getFilesDir().toString()+"/"+imageName);
+                Log.d("ImageLog",folderPath+"/"+"image.jpg");
+                changePath(context.getFilesDir().toString()+"TTStext.txt",folderPath+"/"+ttsName);
+                changePath(context.getFilesDir().toString()+"image.jpg",folderPath+"/"+imageName);
             }
 
             return null;
@@ -675,5 +677,11 @@ public class Ocr extends AppCompatActivity {
         for ( File c : cacheFiles ) {
             fileDelete( c.getAbsolutePath( ) );
         }
+    }
+
+    public void changePath(String filename, String newFilename) {
+        File mFile = new File( filename );
+        File mFileNew = new File( newFilename );
+        if( mFile.exists() ) mFile.renameTo( mFileNew );
     }
 }
