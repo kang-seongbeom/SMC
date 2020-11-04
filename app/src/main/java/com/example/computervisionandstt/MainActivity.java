@@ -12,6 +12,7 @@ import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.View;
@@ -31,16 +32,15 @@ public class MainActivity extends AppCompatActivity {
     private FileOutputStream fileOutputStream;
     public static final String topFile ="TopFile";
 
-
-    @Override
+        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button toOcr=findViewById(R.id.toOcr);
 
         //내부저장소 파일 쓰기
-        Context context=getApplicationContext();
         FileOutputStream fos=null;
+        Context context=getApplicationContext();
         try{
             fos=openFileOutput(topFile, Context.MODE_PRIVATE);
             fos.close();
@@ -50,16 +50,13 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        //내부 생성파일 존재 확인
-        String path= getFilesDir().toString()+ topFile;
-        File topFile=new File(path);
-        Log.d("exists",topFile.getAbsolutePath());
 
-        if(!topFile.exists()){
-            Log.d("exists","ok");
-        }else{
-            Log.d("exists","nope");
-        }
+        String folderPath=context.getFilesDir().toString()+"/"+"foder1";
+
+        File mkFoilderFile=new File(folderPath);
+
+        if(!mkFoilderFile.exists())
+            mkFoilderFile.mkdirs();
 
         toOcr.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(ocrintent);
             }
         });
-
     }
 
 

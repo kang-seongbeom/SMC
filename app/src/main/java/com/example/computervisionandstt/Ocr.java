@@ -79,7 +79,6 @@ public class Ocr extends AppCompatActivity {
     private String ocrSubscribeKey ="e6fa0dbec3e84f249798724b60ee8489";
     private String ocrEndPoint ="https://kangvision.cognitiveservices.azure.com/vision/v2.0/";
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -94,7 +93,6 @@ public class Ocr extends AppCompatActivity {
         ocrImage=findViewById(R.id.ocrImage);
         ocrImageToText=findViewById(R.id.ocrImageToText);
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
-
 
         //버튼
         Button getImageButton=findViewById(R.id.getImageButton);
