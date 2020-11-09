@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Linear_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:screenOrientation="portrait">
+
+        <TextView
+            android:id="@+id/R_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
+
+        <TextView
+            android:id="@+id/R_date"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"/>
+
+
+
+</LinearLayout>

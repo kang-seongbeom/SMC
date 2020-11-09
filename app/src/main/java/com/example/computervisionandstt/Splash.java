@@ -1,6 +1,7 @@
 package com.example.computervisionandstt;
 
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -10,35 +11,53 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 public class Splash extends AppCompatActivity {
-    final int REQUEST_AUDIO_PEMISSION_CODE = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        startTimeMillis = System.currentTimeMillis();
+        //최상위 파일 생성
+        String mCreateTopFilePath= Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "EASYWRITTEN";
+        CreateFile(mCreateTopFilePath);
+
+        mStartTimeMillis = System.currentTimeMillis();
 
         /**
          * On a post-Android 6.0 devices, check if the required permissions have
          * been granted.
          */
         if (Build.VERSION.SDK_INT >= 23) {
-            checkPermissions();
+            CheckPermissions();
         } else {
-            startNextActivity();
+            StartNextActivity();
         }
 
+    }
+
+    private void CreateFile(String FilePath){
+        File mTopFile=new File(FilePath);
+        if(!mTopFile.exists()){
+            boolean mkdirs=mTopFile.mkdirs();
+            if(!mkdirs){
+                Log.d("파일생성","실패");
+            }
+            else
+                Log.d("파일생성","성공");
+        }else{
+            Log.d("TopFile","최상위 파일이 이미 존재");
+        }
     }
 
     @Override
@@ -56,29 +75,13 @@ public class Splash extends AppCompatActivity {
     /**
      * The time that the splash screen will be on the screen in milliseconds.
      */
-    private int timeoutMillis = 1000;
+    private int mTimeoutMillis = 1000;
 
-    /**
-     * The time when this {@link Activity} was created.
-     */
-    private long startTimeMillis = 0;
+    /** The time when this {@link Activity} was created. */
+    private long mStartTimeMillis = 0;
 
-    /**
-     * The code used when requesting permissions
-     */
-    private static final int PERMISSIONS_REQUEST = 1234;
-
-    /**
-     * A random number generator for the background colors.
-     */
-    private static final Random random = new Random();
-
-    /**
-     * The TextView which is used to inform the user whether the permissions are
-     * granted.
-     */
-    private TextView textView = null;
-    private static final int textViewID = View.generateViewId();
+    /** The code used when requesting permissions */
+    private static final int mPERMISSIONS_REQUEST = 1234;
 
     /*
      * ---------------------------------------------
@@ -87,25 +90,20 @@ public class Splash extends AppCompatActivity {
      *
      * ---------------------------------------------
      */
-
     /**
      * Get the time (in milliseconds) that the splash screen will be on the
      * screen before starting the {@link Activity} who's class is returned by
-     * {@link #getNextActivityClass()}.
+     * {@link #GetNextActivityClass()}.
      */
     public int getTimeoutMillis() {
-        return timeoutMillis;
+        return mTimeoutMillis;
     }
 
-    /**
-     * Get the {@link Activity} to start when the splash screen times out.
-     */
+    /** Get the {@link Activity} to start when the splash screen times out. */
     @SuppressWarnings("rawtypes")
-    public Class getNextActivityClass() {
+    public Class GetNextActivityClass() {
         return MainActivity.class;
-    }
-
-    ;
+    };
 
     /**
      * Get the list of required permissions by searching the manifest. If you
@@ -118,19 +116,33 @@ public class Splash extends AppCompatActivity {
      * </code>
      * </pre>
      */
-    public String[] getRequiredPermissions() {
-        String[] permissions = null;
+    public String[] GetRequiredPermissions() {
+        String[] mPermissions = null;
         try {
-            permissions = getPackageManager().getPackageInfo(getPackageName(),
+            mPermissions = getPackageManager().getPackageInfo(getPackageName(),
                     PackageManager.GET_PERMISSIONS).requestedPermissions;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        if (permissions == null) {
+        if (mPermissions == null) {
             return new String[0];
         } else {
-            return permissions.clone();
+            return mPermissions.clone();
         }
+    }
+
+    /*
+     * ---------------------------------------------
+     *
+     * Activity Methods
+     *
+     * ---------------------------------------------
+     */
+
+    private boolean checkPermissionFromDevice(){
+        int write_external_storage_resuly= ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int record_audio_result=ContextCompat.checkSelfPermission(this,Manifest.permission.RECORD_AUDIO);
+        return write_external_storage_resuly== PackageManager.PERMISSION_GRANTED && record_audio_result==PackageManager.PERMISSION_GRANTED;
     }
 
     /*
@@ -150,8 +162,8 @@ public class Splash extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST) {
-            checkPermissions();
+        if (requestCode == mPERMISSIONS_REQUEST) {
+            CheckPermissions();
         }
     }
 
@@ -162,55 +174,54 @@ public class Splash extends AppCompatActivity {
      *
      * ---------------------------------------------
      */
-
     /**
      * After the timeout, start the {@link Activity} as specified by
-     * {@link #getNextActivityClass()}, and remove the splash screen from the
+     * {@link #GetNextActivityClass()}, and remove the splash screen from the
      * backstack. Also, we can change the message shown to the user to tell them
      * we now have the requisite permissions.
      */
-    private void startNextActivity() {
+    private void StartNextActivity() {
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
             }
         });
-        long delayMillis = getTimeoutMillis() - (System.currentTimeMillis() - startTimeMillis);
-        if (delayMillis < 0) {
-            delayMillis = 0;
+        long mDelayMillis = getTimeoutMillis() - (System.currentTimeMillis() - mStartTimeMillis);
+        if (mDelayMillis < 0) {
+            mDelayMillis = 0;
         }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(Splash.this, getNextActivityClass()));
+                startActivity(new Intent(Splash.this, GetNextActivityClass()));
                 finish();
             }
-        }, delayMillis);
+        }, mDelayMillis);
     }
 
     /**
      * Check if the required permissions have been granted, and
-     * {@link #startNextActivity()} if they have. Otherwise
+     * {@link #StartNextActivity()} if they have. Otherwise
      * {@link #requestPermissions(String[], int)}.
      */
-    private void checkPermissions() {
-        String[] ungrantedPermissions = requiredPermissionsStillNeeded();
+    private void CheckPermissions() {
+        String[] ungrantedPermissions = RequiredPermissionsStillNeeded();
         if (ungrantedPermissions.length == 0) {
-            startNextActivity();
+            StartNextActivity();
         } else {
-            requestPermissions(ungrantedPermissions, PERMISSIONS_REQUEST);
+            requestPermissions(ungrantedPermissions, mPERMISSIONS_REQUEST);
         }
     }
 
     @TargetApi(23)
-    private String[] requiredPermissionsStillNeeded() {
+    private String[] RequiredPermissionsStillNeeded() {
 
         Set<String> permissions = new HashSet<String>();
-        for (String permission : getRequiredPermissions()) {
+        for (String permission : GetRequiredPermissions()) {
             permissions.add(permission);
         }
-        for (Iterator<String> i = permissions.iterator(); i.hasNext(); ) {
+        for (Iterator<String> i = permissions.iterator(); i.hasNext();) {
             String permission = i.next();
             if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
                 Log.d(Splash.class.getSimpleName(),
@@ -223,4 +234,6 @@ public class Splash extends AppCompatActivity {
         }
         return permissions.toArray(new String[permissions.size()]);
     }
+
+
 }

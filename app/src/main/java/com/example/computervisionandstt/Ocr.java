@@ -74,6 +74,7 @@ public class Ocr extends AppCompatActivity {
     private String ocrSubscribeKey ="e6fa0dbec3e84f249798724b60ee8489";
     private String ocrEndPoint ="https://kangvision.cognitiveservices.azure.com/vision/v2.0/";
 
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -123,8 +124,8 @@ public class Ocr extends AppCompatActivity {
                     ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
                     final ByteArrayInputStream inputStream=new ByteArrayInputStream(outputStream.toByteArray());
-                    ImageAnalyticsAsyc imageAnalyticsAsyc=new ImageAnalyticsAsyc();
-                    imageAnalyticsAsyc.execute(inputStream);
+                    Ocr.ImageAnalytics imageAnalytics=new Ocr.ImageAnalytics();
+                    imageAnalytics.execute(inputStream);
                 }
             }
         });
@@ -164,13 +165,13 @@ public class Ocr extends AppCompatActivity {
                 alertDialog.setPositiveButton("저장", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        FileSaveAsyc fileSaveAsyc=new FileSaveAsyc();
+                        SaveFile checkTypesTask=new SaveFile();
                         String fileName=saveFileName.getText().toString();
                         String Contents=ocrImageToText.toString();
                         GetSet getSet=new GetSet();
                         getSet.setFileName(fileName);
                         getSet.setContents(Contents);
-                        fileSaveAsyc.execute((GetSet) getSet);
+                        checkTypesTask.execute((GetSet) getSet);
                     }
                 });
 
@@ -189,7 +190,7 @@ public class Ocr extends AppCompatActivity {
     }
 
     //이미지의 텍스트 추출
-    public class ImageAnalyticsAsyc extends AsyncTask<InputStream,String,String> {
+    public class ImageAnalytics extends AsyncTask<InputStream,String,String> {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Ocr.this);
         AlertDialog alertDialog;
         @Override
@@ -202,6 +203,7 @@ public class Ocr extends AppCompatActivity {
 
         @Override
         protected String doInBackground(InputStream... inputStreams) {
+
             try{
                 Log.d("doInBackground:","doInBackground");
                 OCR ocr=visionServiceRestClient.recognizeText(inputStreams[0], LanguageCodes.Korean,true);
@@ -233,7 +235,7 @@ public class Ocr extends AppCompatActivity {
     }
 
     //파일저장
-    private class FileSaveAsyc extends AsyncTask<GetSet,Void,Void> {
+    private class SaveFile extends AsyncTask<GetSet,Void,Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -250,66 +252,57 @@ public class Ocr extends AppCompatActivity {
         protected Void doInBackground(GetSet... Received) {
 
             String receivedFileName=Received[0].fileName;
-            String receivedContents=Received[0].contents;
+            String receivedContents=Received[0].Contents;
 
             Context context=getApplicationContext();
 
             //저장 할 파일 경로
-            String folderPath=context.getFilesDir().toString()+"/"+receivedFileName+"#"+getCurrentTime();
-            File createFoilder=new File(folderPath);
-            if(!createFoilder.exists())
-                createFoilder.mkdirs();
-            //저장시킬 파일 만들기
-
-            String ttsName = "TTStext.txt";
+            String createFilePath= context.getFilesDir()+"/"+ receivedFileName+"#"+getCurrentTime();
+            String ttsName="TTStext.txt";
             String imageName="image.jpg";
+            String ttsFilePath = createFilePath + "/" + ttsName;
+            String imageFilePath=createFilePath+"/"+imageName;
 
-            //TTS텍스트 저장
-            if(receivedContents!=null) {
-                FileOutputStream fos = null;
-                try {
-                    File tmpTextFile=new File(context.getFilesDir().toString(),ttsName);
-                    tmpTextFile.createNewFile();
-                    fos = new FileOutputStream(tmpTextFile);
-                    BufferedWriter mWriter = new BufferedWriter(new OutputStreamWriter(fos));
-                    mWriter.write(receivedContents);
-                    mWriter.flush();
-                    mWriter.close();
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            //저장시킬 파일 만들기
+            File createFolder=new File(createFilePath);
+            if(!createFolder.exists())
+                createFolder.mkdirs();
+
+            if(createFolder.exists()) {
+                //TTS텍스트 저장
+                if (receivedContents != null) {
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(ttsFilePath, true);
+                        BufferedWriter mWriter = new BufferedWriter(new OutputStreamWriter(fos));
+                        mWriter.write(receivedContents);
+                        mWriter.flush();
+                        mWriter.close();
+                        fos.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //image저장
+                if(cacheFilePath!=null){
+                    FileOutputStream fos=null;
+                    try {
+                        File tmpImageFile=new File(imageFilePath);
+                        tmpImageFile.createNewFile();
+                        fos = new FileOutputStream(tmpImageFile);
+                        Bitmap bitmap= BitmapFactory.decodeFile(cacheFilePath);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-
-            //이미지 저장
-            if(cacheFilePath!=null){
-                FileOutputStream fos=null;
-                try{
-                    File tmpImageFile=new File(context.getFilesDir().toString(),imageName);
-                    tmpImageFile.createNewFile();
-                    fos=new FileOutputStream(tmpImageFile);
-                    Bitmap bitmap= BitmapFactory.decodeFile(cacheFilePath);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG,100,fos);
-                    fos.close();
-                }catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            //경로 변경
-            if(createFoilder.exists()){
-                Log.d("TTSLog",context.getFilesDir().toString()+"/"+ttsName);
-                Log.d("TTSLog",folderPath+"/"+"TTStext.txt");
-                Log.d("ImageLog",context.getFilesDir().toString()+"/"+imageName);
-                Log.d("ImageLog",folderPath+"/"+"image.jpg");
-                changePath(context.getFilesDir().toString()+"TTStext.txt",folderPath+"/"+ttsName);
-                changePath(context.getFilesDir().toString()+"image.jpg",folderPath+"/"+imageName);
-            }
-
             return null;
         }
     }
@@ -677,11 +670,5 @@ public class Ocr extends AppCompatActivity {
         for ( File c : cacheFiles ) {
             fileDelete( c.getAbsolutePath( ) );
         }
-    }
-
-    public void changePath(String filename, String newFilename) {
-        File mFile = new File( filename );
-        File mFileNew = new File( newFilename );
-        if( mFile.exists() ) mFile.renameTo( mFileNew );
     }
 }

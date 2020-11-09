@@ -1,8 +1,34 @@
 package com.example.computervisionandstt;
 
 public class GetSet {
-    String fileName, contents;
+    //파일 저장을 위한 getset
+    String fileName,Contents;
+    //recyclerview를 위한 getset
+    String name,date;
 
+    public GetSet(){
+
+    }
+    public GetSet(String name,String date){
+        this.name=name;
+        this.date=date;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public String getFileName() {
         return fileName;
@@ -13,10 +39,10 @@ public class GetSet {
     }
 
     public String getContents() {
-        return contents;
+        return Contents;
     }
 
     public void setContents(String contents) {
-        this.contents = contents;
+        Contents = contents;
     }
 }
