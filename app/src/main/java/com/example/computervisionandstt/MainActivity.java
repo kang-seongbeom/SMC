@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         Button toOcr=findViewById(R.id.toOcr);
         Button toFileView=findViewById(R.id.toFileView);
 
+
         toOcr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
