@@ -25,15 +25,15 @@ public class ImageAndTextView extends AppCompatActivity {
         setContentView(R.layout.activity_image_and_text_view);
 
         ImageView imageView=findViewById(R.id.savedImage);
-        TextView textView=findViewById(R.id.saveButton);
+        TextView textView=findViewById(R.id.savedText);
         Button button=findViewById(R.id.ttsStart);
 
         Intent intent=getIntent();
         String path=intent.getStringExtra("paths");
         if(path!=null){
             Log.d("pathing",path);
-//            Glide.with(this).load(path+"/"+"image.jpg").into(imageView);
-//            textView.setText(ReadTextFile(path+"/"+"TTStext.txt"));
+            Glide.with(this).load(path+"/"+"image.jpg").into(imageView);
+            textView.setText(ReadTextFile(path+"/"+"TTStext.txt"));
         }
         else{
             Log.d("pathing","nope");
