@@ -1,6 +1,7 @@
 package com.example.computervisionandstt;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -34,7 +35,6 @@ public class FileView extends AppCompatActivity  {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-
         mArrayList = new ArrayList<>();
         mAdapter = new CustomAdapter(mArrayList);
         mRecyclerView.setAdapter(mAdapter);
@@ -55,11 +55,11 @@ public class FileView extends AppCompatActivity  {
             @Override
             public void onClick(View view, int position) {
                 //파일값 넘기기
-//                Intent intent = new Intent(getBaseContext(), Image_MainAdpater.class);
-//                intent.putExtra("filesNameList", filesNameList.get(position));
-//                intent.putExtra("filesDateList", filesDateList.get(position));
-//                intent.putExtra("paths", mFiles[position].getPath());
-//                startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), ImageAndTextView.class);
+                intent.putExtra("filesNameList", filesNameList.get(position));
+                intent.putExtra("filesDateList", filesDateList.get(position));
+                intent.putExtra("paths", mFiles[position].getPath());
+                startActivity(intent);
             }
 
             @Override

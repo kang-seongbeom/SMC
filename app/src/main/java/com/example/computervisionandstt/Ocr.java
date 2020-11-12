@@ -167,7 +167,7 @@ public class Ocr extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         SaveFile checkTypesTask=new SaveFile();
                         String fileName=saveFileName.getText().toString();
-                        String Contents=ocrImageToText.toString();
+                        String Contents=ocrImageToText.getText().toString();
                         GetSet getSet=new GetSet();
                         getSet.setFileName(fileName);
                         getSet.setContents(Contents);
@@ -274,6 +274,7 @@ public class Ocr extends AppCompatActivity {
                     FileOutputStream fos = null;
                     try {
                         fos = new FileOutputStream(ttsFilePath, true);
+                        Log.d("receivedContents",receivedContents);
                         BufferedWriter mWriter = new BufferedWriter(new OutputStreamWriter(fos));
                         mWriter.write(receivedContents);
                         mWriter.flush();

@@ -14,6 +14,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -31,7 +36,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    //computervision
+    //computervision(ocr)
     implementation 'com.microsoft.projectoxford:vision:1.0.395'
 
     //recycler
@@ -40,6 +45,9 @@ dependencies {
     //viewpager2
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation "com.google.android.material:material:1.1.0-beta01"
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
 
 
 
