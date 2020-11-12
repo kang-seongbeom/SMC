@@ -11,15 +11,22 @@
 
         android:layout_width="match_parent"
         android:layout_height="600dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
         <ImageView
             android:id="@+id/savedImage"
             android:layout_width="match_parent"
-            android:layout_height="100dp"/>
+            android:layout_height="0dp"
+            android:layout_weight="0.2"/>
+        <ImageView
+            android:id="@+id/reSizeHeight"
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
         <TextView
             android:id="@+id/savedText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="0dp"
+            android:layout_weight="0.8"/>
     </LinearLayout>
     <Button
         android:id="@+id/ttsStart"
