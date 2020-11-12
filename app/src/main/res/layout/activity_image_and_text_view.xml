@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-
+        android:id="@+id/linearView"
         android:layout_width="match_parent"
         android:layout_height="600dp"
         android:orientation="vertical"
@@ -17,11 +17,13 @@
             android:id="@+id/savedImage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.2"/>
+            android:layout_weight="0.2"
+            android:maxHeight="450dp"/>
         <ImageView
             android:id="@+id/reSizeHeight"
             android:layout_width="match_parent"
-            android:layout_height="10dp" />
+            android:layout_height="10dp"
+            />
         <TextView
             android:id="@+id/savedText"
             android:layout_width="match_parent"

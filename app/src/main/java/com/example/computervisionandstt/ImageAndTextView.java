@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +30,7 @@ import java.util.Locale;
 public class ImageAndTextView extends AppCompatActivity {
 
     private TextToSpeech textToSpeech;
-    private TextView textView;
+    private TextView savedText;
 
     // 시작 위치를 저장을 위한 변수
     private float mLastMotionX = 0;
@@ -49,17 +50,22 @@ public class ImageAndTextView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_and_text_view);
 
-        ImageView imageView=findViewById(R.id.savedImage);
+        ImageView savedImage=findViewById(R.id.savedImage);
         ImageView reSizeHeight=findViewById(R.id.reSizeHeight);
-        textView=findViewById(R.id.savedText);
+        savedText =findViewById(R.id.savedText);
         Button ttsButton=findViewById(R.id.ttsStart);
+        LinearLayout linearView=findViewById(R.id.linearView);
+
+        //이미지와 텍스트 최대 크기 조절
+        savedImage.setMaxHeight(linearView.getHeight()-50);
+        savedText.setMaxHeight(linearView.getHeight()-50);
 
         Intent intent=getIntent();
         String path=intent.getStringExtra("paths");
         if(path!=null){
             Log.d("pathing",path);
-            Glide.with(this).load(path+"/"+"image.jpg").into(imageView);
-            textView.setText(ReadTextFile(path+"/"+"TTStext.txt"));
+            Glide.with(this).load(path+"/"+"image.jpg").into(savedImage);
+            savedText.setText(ReadTextFile(path+"/"+"TTStext.txt"));
         }
         else{
             Log.d("pathing","nope");
@@ -115,8 +121,13 @@ public class ImageAndTextView extends AppCompatActivity {
                         final float y = event.getY();
                         final int deltaX = Math.abs((int) (mLastMotionX - x));
                         final int deltaY = Math.abs((int) (mLastMotionY - y));
-                        Log.e("CLICK",deltaX+"");
-                        Log.e("CLICK",deltaY+"");
+
+                        Log.d("CLICKy", y+"");
+
+                        savedImage.getLayoutParams().height=savedImage.getHeight()+(int)y;
+                        savedText.getLayoutParams().height= savedText.getHeight()+(int)y;
+                        savedImage.requestLayout();
+                        savedText.requestLayout();
 
                         // 일정 범위 벗어나면  취소함
                         if (deltaX >= mTouchSlop || deltaY >= mTouchSlop) {
@@ -189,7 +200,7 @@ public class ImageAndTextView extends AppCompatActivity {
 
     //tts
     private void speackOut(){
-        CharSequence charSequence=textView.getText();
+        CharSequence charSequence= savedText.getText();
         if(charSequence!=null){
             textToSpeech.setPitch((float)0.6);
             textToSpeech.setSpeechRate((float)1.0);
