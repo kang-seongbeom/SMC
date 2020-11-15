@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/Linear_list_item"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:screenOrientation="portrait">
-
-        <TextView
-            android:id="@+id/R_name"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="10dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp">
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/Linear_list_item"
             android:layout_width="match_parent"
-            android:layout_height="40dp" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:screenOrientation="portrait"
+            android:padding="10dp">
 
-        <TextView
-            android:id="@+id/R_date"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"/>
+                <TextView
+                    android:id="@+id/R_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/R_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+        </LinearLayout>
+</androidx.cardview.widget.CardView>
 
 
 
-</LinearLayout>

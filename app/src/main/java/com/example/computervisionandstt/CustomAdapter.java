@@ -49,7 +49,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder viewholder, int position) {
 
-        viewholder.mName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+        viewholder.mName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         viewholder.mDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
         viewholder.mName.setGravity(Gravity.CENTER);
         viewholder.mDate.setGravity(Gravity.CENTER);

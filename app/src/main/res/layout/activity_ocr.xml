@@ -13,7 +13,8 @@
         android:id="@+id/ocrImageToText"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical|horizontal"
+        />
     <LinearLayout
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
