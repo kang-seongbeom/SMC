@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -8,45 +10,81 @@
     <ImageView
         android:id="@+id/ocrImage"
         android:layout_width="match_parent"
-        android:layout_height="250dp"/>
+        android:layout_height="300dp"/>
     <TextView
         android:id="@+id/ocrImageToText"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="300dp"
         android:scrollbars="vertical|horizontal"
         />
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/getImageButton"
-            android:text="이미지"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/captureButton"
-            android:text="사진"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/ocrStartButton"
-            android:text="ocr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 
-        <Button
-            android:id="@+id/ttsStartButton"
-            android:text="tts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/saveButton"
-            android:text="저장"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+
+        <LinearLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/captureButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="20dp"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_photo_camera_24" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/getImageButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="20dp"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_image_search_24" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="104dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            app:layout_constraintTop_toTopOf="@+id/constraintLayout"
+            tools:layout_editor_absoluteX="0dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ocrStartButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_g_translate_24" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ttsStartButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_graphic_eq_24" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/saveButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_stop_24" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>

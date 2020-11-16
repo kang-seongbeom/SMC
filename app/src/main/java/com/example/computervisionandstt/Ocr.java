@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,11 +92,11 @@ public class Ocr extends AppCompatActivity {
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
         //버튼
-        Button getImageButton=findViewById(R.id.getImageButton);
-        Button captureButton=findViewById(R.id.captureButton);
-        Button ocrStartButton=findViewById(R.id.ocrStartButton);
-        Button ttsStartButton=findViewById(R.id.ttsStartButton);
-        Button saveButton=findViewById(R.id.saveButton);
+        ImageView getImageButton=findViewById(R.id.getImageButton);
+        ImageView captureButton=findViewById(R.id.captureButton);
+        ImageView ocrStartButton=findViewById(R.id.ocrStartButton);
+        ImageView ttsStartButton=findViewById(R.id.ttsStartButton);
+        ImageView saveButton=findViewById(R.id.saveButton);
 
         //getImageButton
         getImageButton.setOnClickListener(new View.OnClickListener() {
