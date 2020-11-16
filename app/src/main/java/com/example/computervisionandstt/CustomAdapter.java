@@ -24,8 +24,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
         public CustomViewHolder(View view) {
             super(view);
-            this.mName = (TextView) view.findViewById(R.id.R_date);
-            this.mDate = (TextView) view.findViewById(R.id.R_name);
+            this.mName = (TextView) view.findViewById(R.id.R_name);
+            this.mDate = (TextView) view.findViewById(R.id.R_date);
         }
     }
 
@@ -49,8 +49,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder viewholder, int position) {
 
-        viewholder.mName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        viewholder.mDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+        viewholder.mName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+        viewholder.mDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         viewholder.mName.setGravity(Gravity.CENTER);
         viewholder.mDate.setGravity(Gravity.CENTER);
         viewholder.mName.setText(mList.get(position).getName());
@@ -69,5 +69,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     public void setItemBackground(@NonNull CustomViewHolder viewholder, String colorString){
         viewholder.mName.setBackgroundColor(Color.parseColor(colorString));
         viewholder.mDate.setBackgroundColor(Color.parseColor(colorString));
+    }
+
+    public void filterList(ArrayList<GetSet> filteredList){
+        mList=filteredList;
+        notifyDataSetChanged();
     }
 }

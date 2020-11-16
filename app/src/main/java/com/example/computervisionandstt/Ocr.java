@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -22,16 +23,20 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.speech.tts.TextToSpeech;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +49,8 @@ import com.microsoft.projectoxford.vision.contract.Region;
 import com.microsoft.projectoxford.vision.contract.Word;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -58,12 +65,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 public class Ocr extends AppCompatActivity {
 
     private VisionServiceRestClient visionServiceRestClient;
+    private LinearLayout firstConstraintLayout,secondConstraintLayout;
     private ImageView ocrImage;
     private TextView ocrImageToText;
     private TextToSpeech textToSpeech;
@@ -74,6 +83,10 @@ public class Ocr extends AppCompatActivity {
     private String cacheFilePath = null;
     private String ocrSubscribeKey ="e6fa0dbec3e84f249798724b60ee8489";
     private String ocrEndPoint ="https://kangvision.cognitiveservices.azure.com/vision/v2.0/";
+
+    //sharedpreference
+    private ArrayList<String> mCategoryArrayList;
+    private final String sharedPreferenceKey="saveArrayListToSharedPreference";
 
 
     @Override
@@ -98,12 +111,27 @@ public class Ocr extends AppCompatActivity {
         ImageView ttsStartButton=findViewById(R.id.ttsStartButton);
         ImageView saveButton=findViewById(R.id.saveButton);
 
+        //Linear
+        firstConstraintLayout=findViewById(R.id.firstConstraintLayout);
+        secondConstraintLayout=findViewById(R.id.secondConstraintLayout);
+
+        //카테고리에 저장된 정보를 받아옴
+        //카테고리 최상단은 항상 기본 카테고리
+        mCategoryArrayList=new ArrayList<>();
+        Context mContext=getApplicationContext();
+        mCategoryArrayList=getStringArrayPref(mContext,sharedPreferenceKey);
+        if(mCategoryArrayList.size()==0) mCategoryArrayList.add("tmp");
+        mCategoryArrayList.set(0,"기본 카테고리");
+        setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
+
+
         //getImageButton
         getImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //cacheDirFileClear();
                 onAlbum( REQUEST_ALBUM );
+
             }
         });
 
@@ -113,6 +141,7 @@ public class Ocr extends AppCompatActivity {
             public void onClick(View v) {
                 //cacheDirFileClear();
                 requestPermissions( new String[]{ Manifest.permission.CAMERA }, REQUEST_CAMERA );
+
             }
         });
 
@@ -160,17 +189,70 @@ public class Ocr extends AppCompatActivity {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(Ocr.this);
                 alertDialog.setMessage("파일이름");
 
-                saveFileName=new EditText(Ocr.this);
-                alertDialog.setView(saveFileName);
+                //저장 팝업창은 dialog_spinner을 사용
+                View mView=getLayoutInflater().inflate(R.layout.dialog_spinner,null);
+                final EditText mSaveFileName=(EditText) mView.findViewById(R.id.saveFileName);
+                final ImageView addCategory=(ImageView)mView.findViewById(R.id.addCategory);
+                final Spinner dialogSpinner=(Spinner)mView.findViewById(R.id.dialogSpinner);
+
+                //dialog창에 구성요소들 추가
+                alertDialog.setView(mSaveFileName);
+                alertDialog.setView(addCategory);
+                alertDialog.setView(dialogSpinner);
+                alertDialog.setView(mView);
+
+                //카테고리 배열에 카테고리를 불러옴
+                mCategoryArrayList.clear();
+                mCategoryArrayList=getStringArrayPref(mContext,sharedPreferenceKey);
+                ArrayAdapter<String> mArrayAdapter=new ArrayAdapter<String>(getApplicationContext(),
+                        R.layout.support_simple_spinner_dropdown_item,mCategoryArrayList);
+                mArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+                dialogSpinner.setAdapter(mArrayAdapter);
+
+                //'+'버튼을 누르면 카토고리 추가 dialog창뜨게 함
+                addCategory.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder mCategoryAlert = new AlertDialog.Builder(Ocr.this);
+                        EditText addCategoryEditText=new EditText(Ocr.this);
+                        mCategoryAlert.setMessage("카테고리 이름");
+                        mCategoryAlert.setView(addCategoryEditText);
+                        mCategoryAlert.setPositiveButton("추가", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //카테고리배열에 카테고리정보를 불러옴
+                                mCategoryArrayList.clear();
+                                mCategoryArrayList=getStringArrayPref(mContext,sharedPreferenceKey);
+                                mCategoryArrayList.add(addCategoryEditText.getText().toString());
+                                setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
+
+                                //카테고리 생성시 스피너가 클릭되지 않는 버그가 있어서 강제로 스피너 refresh
+                                ArrayAdapter<String> mCategoryArrayAdapter=new ArrayAdapter<String>(getApplicationContext(),
+                                        R.layout.support_simple_spinner_dropdown_item,mCategoryArrayList);
+                                mCategoryArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+                                dialogSpinner.setAdapter(mCategoryArrayAdapter);
+                            }
+                        });
+                        mCategoryAlert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        AlertDialog mCategoryAlertDialog=mCategoryAlert.create();
+                        mCategoryAlertDialog.show();
+                    }
+                });
+
 
                 alertDialog.setPositiveButton("저장", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         SaveFile checkTypesTask=new SaveFile();
-                        String fileName=saveFileName.getText().toString();
+                        String fileName=mSaveFileName.getText().toString();
                         String Contents=ocrImageToText.getText().toString();
+                        String mTmpCategory=dialogSpinner.getSelectedItem().toString();
                         GetSet getSet=new GetSet();
-                        getSet.setFileName(fileName);
+                        getSet.setFileName(mTmpCategory+"#"+fileName);
                         getSet.setContents(Contents);
                         checkTypesTask.execute((GetSet) getSet);
                     }
@@ -363,6 +445,8 @@ public class Ocr extends AppCompatActivity {
             AlbumAdd( cacheFilePath );
             Log.d("cacheFilePathCamera",cacheFilePath);
             ocrImage.setImageBitmap( getBitmapCamera( ocrImage, cacheFilePath ) );
+            firstConstraintLayout.setVisibility(View.GONE);
+            secondConstraintLayout.setVisibility(View.VISIBLE);
 
         } else if ( requestCode == REQUEST_ALBUM && resultCode == RESULT_OK ) {
 
@@ -380,6 +464,9 @@ public class Ocr extends AppCompatActivity {
                 Log.d("cacheFilePathImage",cacheFilePath);
 
                 ocrImage.setImageBitmap( getBitmapAlbum( ocrImage, albumUri ) );
+
+                firstConstraintLayout.setVisibility(View.GONE);
+                secondConstraintLayout.setVisibility(View.VISIBLE);
 
             } catch ( Exception e ) {
                 e.printStackTrace( );
@@ -672,5 +759,39 @@ public class Ocr extends AppCompatActivity {
         for ( File c : cacheFiles ) {
             fileDelete( c.getAbsolutePath( ) );
         }
+    }
+
+    private void setStringArrayPref(Context context, String key, ArrayList<String> values) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        JSONArray a = new JSONArray();
+
+        for (int i = 0; i < values.size(); i++) {
+            a.put(values.get(i));
+        }
+        if (!values.isEmpty()) {
+            editor.putString(key, a.toString());
+        } else {
+            editor.putString(key, null);
+        }
+        editor.apply();
+    }
+
+    private ArrayList<String> getStringArrayPref(Context context, String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String json = prefs.getString(key, null);
+        ArrayList<String> urls = new ArrayList<String>();
+        if (json != null) {
+            try {
+                JSONArray a = new JSONArray(json);
+                for (int i = 0; i < a.length(); i++) {
+                    String url = a.optString(i);
+                    urls.add(url);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return urls;
     }
 }

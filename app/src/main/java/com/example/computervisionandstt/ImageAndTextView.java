@@ -70,8 +70,8 @@ public class ImageAndTextView extends AppCompatActivity {
         ImageView savedImage = findViewById(R.id.savedImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
-        Button ttsButton = findViewById(R.id.ttsStart);
-        Button roateButton=findViewById(R.id.imageRotate);
+        ImageView ttsButton = findViewById(R.id.ttsStart);
+        ImageView roateButton=findViewById(R.id.imageRotate);
         LinearLayout linearView = findViewById(R.id.linearView);
 
         //스크롤

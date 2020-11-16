@@ -5,11 +5,13 @@ public class GetSet {
     String fileName,Contents;
     //recyclerview를 위한 getset
     String name,date;
+    private String mCategory;
 
     public GetSet(){
 
     }
-    public GetSet(String name,String date){
+    public GetSet(String category,String name,String date){
+        this.mCategory=category;
         this.name=name;
         this.date=date;
     }
@@ -44,5 +46,13 @@ public class GetSet {
 
     public void setContents(String contents) {
         Contents = contents;
+    }
+
+    public String getmCategory() {
+        return mCategory;
+    }
+
+    public void setmCategory(String mCategory) {
+        this.mCategory = mCategory;
     }
 }

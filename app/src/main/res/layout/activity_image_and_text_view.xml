@@ -18,7 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.2"
-            android:maxHeight="450dp"/>
+            android:maxHeight="450dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/stroke"/>
         <ImageView
             android:id="@+id/reSizeHeight"
             android:layout_width="match_parent"
@@ -29,21 +33,39 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.8"
-            android:scrollbars="vertical|horizontal"/>
+            android:scrollbars="vertical|horizontal"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/stroke"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/ttsStart"
-        android:text="start"
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
-    <Button
-        android:id="@+id/imageRotate"
-        android:text="회전"
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/imageRotate"
+            android:text="회전"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:src="@drawable/ic_baseline_rotate_90_degrees_ccw_24"
+            android:layout_marginEnd="20dp"/>
+
+        <ImageView
+            android:id="@+id/ttsStart"
+            android:src="@drawable/ic_baseline_graphic_eq_24"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:layout_marginStart="20dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -10,55 +10,70 @@
     <ImageView
         android:id="@+id/ocrImage"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/stroke"/>
     <TextView
         android:id="@+id/ocrImageToText"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:scrollbars="vertical|horizontal"
-        />
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/stroke"/>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
 
         <LinearLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/firstConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="80dp"
+            android:layout_marginTop="4dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="10dp"
-            app:layout_constraintTop_toTopOf="parent">
+            android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="0dp">
 
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/captureButton"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginEnd="20dp"
-                android:clickable="true"
-                android:src="@drawable/ic_baseline_photo_camera_24" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/getImageButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:clickable="true"
                 android:src="@drawable/ic_baseline_image_search_24" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/captureButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+
+                android:layout_marginStart="20dp"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_photo_camera_24" />
+
+
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/secondConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:layout_marginTop="104dp"
+            android:layout_marginTop="52dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="10dp"
-            app:layout_constraintTop_toTopOf="@+id/constraintLayout"
+            app:layout_constraintTop_toBottomOf="@+id/firstConstraintLayout"
+            android:visibility="invisible"
             tools:layout_editor_absoluteX="0dp">
 
             <androidx.appcompat.widget.AppCompatImageView

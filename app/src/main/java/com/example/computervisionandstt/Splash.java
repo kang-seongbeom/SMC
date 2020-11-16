@@ -28,10 +28,6 @@ public class Splash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        //최상위 파일 생성
-        String mCreateTopFilePath= Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "EASYWRITTEN";
-        CreateFile(mCreateTopFilePath);
-
         mStartTimeMillis = System.currentTimeMillis();
 
         /**
@@ -44,20 +40,6 @@ public class Splash extends AppCompatActivity {
             StartNextActivity();
         }
 
-    }
-
-    private void CreateFile(String FilePath){
-        File mTopFile=new File(FilePath);
-        if(!mTopFile.exists()){
-            boolean mkdirs=mTopFile.mkdirs();
-            if(!mkdirs){
-                Log.d("파일생성","실패");
-            }
-            else
-                Log.d("파일생성","성공");
-        }else{
-            Log.d("TopFile","최상위 파일이 이미 존재");
-        }
     }
 
     @Override
