@@ -48,5 +48,8 @@ dependencies {
     //cardview
     implementation "androidx.cardview:cardview:1.0.0"
 
+    //scale image view
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+
 
 }

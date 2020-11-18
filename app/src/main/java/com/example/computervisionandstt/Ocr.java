@@ -17,6 +17,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -40,6 +42,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.gson.Gson;
 import com.microsoft.projectoxford.vision.VisionServiceRestClient;
 import com.microsoft.projectoxford.vision.contract.LanguageCodes;
@@ -73,7 +77,7 @@ public class Ocr extends AppCompatActivity {
 
     private VisionServiceRestClient visionServiceRestClient;
     private LinearLayout firstConstraintLayout,secondConstraintLayout;
-    private ImageView ocrImage;
+    private SubsamplingScaleImageView ocrImage;
     private TextView ocrImageToText;
     private TextToSpeech textToSpeech;
     private static final int REQUEST_CAMERA = 100;
@@ -100,7 +104,7 @@ public class Ocr extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ocr);
 
-        ocrImage=findViewById(R.id.ocrImage);
+        ocrImage=(SubsamplingScaleImageView)findViewById(R.id.ocrImage);
         ocrImageToText=findViewById(R.id.ocrImageToText);
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
@@ -444,7 +448,9 @@ public class Ocr extends AppCompatActivity {
 
             AlbumAdd( cacheFilePath );
             Log.d("cacheFilePathCamera",cacheFilePath);
-            ocrImage.setImageBitmap( getBitmapCamera( ocrImage, cacheFilePath ) );
+
+            ocrImage.setImage(ImageSource.bitmap(getBitmapCamera( ocrImage, cacheFilePath )));
+
             firstConstraintLayout.setVisibility(View.GONE);
             secondConstraintLayout.setVisibility(View.VISIBLE);
 
@@ -463,7 +469,7 @@ public class Ocr extends AppCompatActivity {
                 cacheFilePath = cacheFile.getAbsolutePath( );
                 Log.d("cacheFilePathImage",cacheFilePath);
 
-                ocrImage.setImageBitmap( getBitmapAlbum( ocrImage, albumUri ) );
+                ocrImage.setImage(ImageSource.bitmap(getBitmapAlbum( ocrImage, albumUri )));
 
                 firstConstraintLayout.setVisibility(View.GONE);
                 secondConstraintLayout.setVisibility(View.VISIBLE);

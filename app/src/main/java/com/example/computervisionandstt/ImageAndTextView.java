@@ -30,10 +30,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,7 +49,9 @@ public class ImageAndTextView extends AppCompatActivity {
     private TextToSpeech textToSpeech;
     private TextView savedText;
 
-    int degree=0;
+    private int degree=0;
+    private String path;
+    SubsamplingScaleImageView savedImage;
 
     // 시작 위치를 저장을 위한 변수
     private float mLastMotionX = 0;
@@ -67,7 +72,8 @@ public class ImageAndTextView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_and_text_view);
 
-        ImageView savedImage = findViewById(R.id.savedImage);
+
+        savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
         ImageView ttsButton = findViewById(R.id.ttsStart);
@@ -78,9 +84,14 @@ public class ImageAndTextView extends AppCompatActivity {
         savedText.setMovementMethod(new ScrollingMovementMethod());
 
         Intent intent = getIntent();
-        String path = intent.getStringExtra("paths");
+        path = intent.getStringExtra("paths");
         if (path != null) {
-            Glide.with(this).load(path + "/" + "image.jpg").into(savedImage);
+            File imgFile = new  File(path + "/" + "image.jpg");
+            if(imgFile.exists()){
+                Bitmap mBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                savedImage.setImage(ImageSource.bitmap(mBitmap));
+            }
+            //Glide.with(this).load(path + "/" + "image.jpg").into(R.drawable.ic_baseline_remove_24);
             savedText.setText(ReadTextFile(path + "/" + "TTStext.txt"));
         } else {
             Log.d("pathing", "nope");
@@ -111,7 +122,12 @@ public class ImageAndTextView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 degree+=90;
-                savedImage.setImageBitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree));
+                if (path != null) {
+                    File mfile = new File(path + "/" + "image.jpg");
+                    if (mfile.exists()) {
+                        savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree)));
+                    }
+                }
             }
         });
 
@@ -154,9 +170,16 @@ public class ImageAndTextView extends AppCompatActivity {
                             //화면을 키우다 보면 화질이 나빠지기 때문에
                             //비트맵으로 디코딩 몫의 숫자를 작게하면 너무 끊김김
                            if(currentHeight%150==0)
-                                savedImage.setImageBitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),0));
+                                //savedImage.setImageBitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),0));
+                               if (path != null) {
+                                   File mfile = new File(path + "/" + "image.jpg");
+                                   if (mfile.exists()) {
+                                       savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree)));
+                                   }
+                               }
 
                             savedText.getLayoutParams().height = savedText.getHeight() + (int) y;
+                            savedImage.requestLayout();
                             savedText.requestLayout();
                         }
 
