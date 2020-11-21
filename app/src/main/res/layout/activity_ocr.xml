@@ -11,12 +11,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="end">
+
+        <LinearLayout
+            android:id="@+id/toFileView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginEnd="250dp"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_baseline_folder_open_24"/>
+            <TextView
+                android:text="File보기"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+
         <ImageView
             android:id="@+id/settingImage"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:src="@drawable/ic_baseline_settings_24"
+            android:src="@drawable/ic_baseline_settings_applications_24"
             android:clickable="true"/>
 
     </LinearLayout>
@@ -84,7 +106,7 @@
             android:id="@+id/secondConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:layout_marginTop="52dp"
+            android:layout_marginTop="4dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="10dp"
