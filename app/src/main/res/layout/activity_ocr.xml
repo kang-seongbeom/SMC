@@ -7,14 +7,29 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end">
+        <ImageView
+            android:id="@+id/settingImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_baseline_settings_24"
+            android:clickable="true"/>
+
+    </LinearLayout>
+
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/ocrImage"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="260dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/stroke"/>
+        android:background="@drawable/stroke"
+        android:padding="10dp"/>
     <TextView
         android:id="@+id/ocrImageToText"
         android:layout_width="match_parent"
@@ -23,7 +38,8 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/stroke"/>
+        android:background="@drawable/stroke"
+        android:padding="10dp"/>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

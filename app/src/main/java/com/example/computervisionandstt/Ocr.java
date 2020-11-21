@@ -17,8 +17,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,13 +29,14 @@ import android.provider.OpenableColumns;
 import android.speech.tts.TextToSpeech;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,7 +74,7 @@ import java.util.Locale;
 
 public class Ocr extends AppCompatActivity {
 
-    private VisionServiceRestClient visionServiceRestClient;
+    private    VisionServiceRestClient visionServiceRestClient;
     private LinearLayout firstConstraintLayout,secondConstraintLayout;
     private SubsamplingScaleImageView ocrImage;
     private TextView ocrImageToText;
@@ -92,6 +91,9 @@ public class Ocr extends AppCompatActivity {
     private ArrayList<String> mCategoryArrayList;
     private final String sharedPreferenceKey="saveArrayListToSharedPreference";
 
+    //tts pitch and speed
+    private int ttsPitch =50;   //0~100
+    private int ttsSpeed =100; //0~200
 
     @Override
     protected void onStart() {
@@ -109,6 +111,7 @@ public class Ocr extends AppCompatActivity {
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
         //버튼
+        ImageView settingImage=findViewById(R.id.settingImage);
         ImageView getImageButton=findViewById(R.id.getImageButton);
         ImageView captureButton=findViewById(R.id.captureButton);
         ImageView ocrStartButton=findViewById(R.id.ocrStartButton);
@@ -128,6 +131,78 @@ public class Ocr extends AppCompatActivity {
         mCategoryArrayList.set(0,"기본 카테고리");
         setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
 
+        //setting
+        settingImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout settingView = (LinearLayout) vi.inflate(R.layout.setting_seekbar, null);
+
+                final TextView setPitchText=settingView.findViewById(R.id.setPitchText);
+                final TextView setSpeechRateText=settingView.findViewById(R.id.setSpeechRateText);
+                final SeekBar setPitchSeekBar=settingView.findViewById(R.id.setPitchSeekBar);
+                final SeekBar setSpeechRateSeekBar=settingView.findViewById(R.id.setSpeechRateSeekBar);
+
+                //기본 값
+                setPitchSeekBar.setProgress((int) ttsPitch);
+                setSpeechRateSeekBar.setProgress((int) ttsSpeed);
+
+                //임시 저장 값
+                final int[] tmpPitch = {ttsPitch};
+                final int[] tmpSpeed={ttsSpeed};
+
+                setPitchSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tmpPitch[0]=progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                setSpeechRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tmpSpeed[0]=progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+
+                new AlertDialog.Builder(Ocr.this).setMessage("속도, 음높이 조절").setView(settingView).setPositiveButton("저장", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ttsPitch=tmpPitch[0];
+                        ttsSpeed=tmpSpeed[0];
+                        Log.d("pitch",ttsPitch+"");
+                        Log.d("speed",ttsSpeed+"");
+                    }
+                }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+            }
+
+        });
 
         //getImageButton
         getImageButton.setOnClickListener(new View.OnClickListener() {
@@ -266,6 +341,7 @@ public class Ocr extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplicationContext(),"저장을 취소 했습니다.",Toast.LENGTH_SHORT).show();
+
                     }
                 });
                 alertDialog.show();
@@ -399,17 +475,22 @@ public class Ocr extends AppCompatActivity {
     private void speackOut(){
         CharSequence charSequence=ocrImageToText.getText();
         if(charSequence!=null){
-            textToSpeech.setPitch((float)0.6);
-            textToSpeech.setSpeechRate((float)1.0);
+            Log.d("pitchAndspeed",ttsPitch+"/"+ttsSpeed);
+            float pitch=(float) ((ttsPitch/100.0));
+            float speed=(float) ((ttsSpeed/100.0));
+            Log.d("pitchAndspeed",pitch+"/"+speed);
+            textToSpeech.setPitch(pitch);
+            textToSpeech.setSpeechRate(speed);
             textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(textToSpeech!=null){
+    protected void onStop() {
+        super.onStop();
+        if (textToSpeech != null) {
             textToSpeech.stop();
             textToSpeech.shutdown();
         }

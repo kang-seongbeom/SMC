@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoTitle">
-        <activity android:name=".ImageAndTextView"></activity>
+        <activity android:name=".Login"></activity>
+        <activity android:name=".ImageAndTextView" />
         <activity android:name=".FileView" />
         <activity android:name=".Splash" />
         <activity android:name=".Ocr" />
