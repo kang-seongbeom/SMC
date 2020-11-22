@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,16 +51,17 @@ import java.util.Locale;
 
 public class ImageAndTextView extends AppCompatActivity {
 
-    private TextToSpeech textToSpeech;
     private TextView savedText;
 
     private int degree=0;
     private String path;
     SubsamplingScaleImageView savedImage;
 
-    //tts pitch and speed
-    private int ttsPitch =50;   //0~100
-    private int ttsSpeed =100; //0~200
+    private MediaPlayer mMediaPlayer;
+    private int mAudioDuration;
+    private int starting=0;
+    public boolean mPlayAndCancelCheck =true, mIsPause=false;
+    private SeekBar mAudioSeekBar;
 
     // 시작 위치를 저장을 위한 변수
     private float mLastMotionX = 0;
@@ -105,96 +107,21 @@ public class ImageAndTextView extends AppCompatActivity {
             Log.d("pathing", "nope");
         }
 
-        //setting
-        settingImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                LinearLayout settingView = (LinearLayout) vi.inflate(R.layout.setting_seekbar, null);
 
-                final TextView setPitchText=settingView.findViewById(R.id.setPitchText);
-                final TextView setSpeechRateText=settingView.findViewById(R.id.setSpeechRateText);
-                final SeekBar setPitchSeekBar=settingView.findViewById(R.id.setPitchSeekBar);
-                final SeekBar setSpeechRateSeekBar=settingView.findViewById(R.id.setSpeechRateSeekBar);
-
-                //기본 값
-                setPitchSeekBar.setProgress((int) ttsPitch);
-                setSpeechRateSeekBar.setProgress((int) ttsSpeed);
-
-                //임시 저장 값
-                final int[] tmpPitch = {ttsPitch};
-                final int[] tmpSpeed={ttsSpeed};
-
-                setPitchSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        tmpPitch[0]=progress;
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-
-                setSpeechRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        tmpSpeed[0]=progress;
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-
-
-                new AlertDialog.Builder(ImageAndTextView.this).setMessage("속도, 음높이 조절").setView(settingView).setPositiveButton("저장", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ttsPitch=tmpPitch[0];
-                        ttsSpeed=tmpSpeed[0];
-                        Log.d("pitch",ttsPitch+"");
-                        Log.d("speed",ttsSpeed+"");
-                    }
-                }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).show();
-            }
-
-        });
-
+        mAudioSeekBar = (SeekBar) findViewById(R.id.AudioSeekBar) ;
         ttsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(int status) {
-                        if (status == TextToSpeech.SUCCESS) {
-                            int result = textToSpeech.setLanguage(Locale.KOREA);
-                            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED)
-                                Log.d("TTS", "언어미지원");
-                            else
-                                speackOut();
-                        } else
-                            Log.d("TTS", "초기화 실패");
-                    }
-                });
-                speackOut();
+                String mIWantPlayAudio = path +"/"+ "ttsAudio.3gp";
+                PlayAndCancel(mIWantPlayAudio);
+                if(mPlayAndCancelCheck ==true) {
+                    ttsButton.setImageDrawable(getResources().
+                            getDrawable(R.drawable.ic_baseline_play_circle_filled_24, getApplicationContext().getTheme()));
+                }
+                else{
+                    ttsButton.setImageDrawable(getResources().
+                            getDrawable(R.drawable.ic_baseline_pause_circle_filled_24, getApplicationContext().getTheme()));
+                }
             }
         });
 
@@ -331,30 +258,13 @@ public class ImageAndTextView extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (textToSpeech != null) {
-            textToSpeech.stop();
-            textToSpeech.shutdown();
+        if (mMediaPlayer != null) {
+            mMediaPlayer.stop();
         }
     }
 
-    //tts
-    //tts
-    private void speackOut(){
-        CharSequence charSequence=savedText.getText();
-        if(charSequence!=null){
-            Log.d("pitchAndspeed",ttsPitch+"/"+ttsSpeed);
-            float pitch=(float) ((ttsPitch/100.0));
-            float speed=(float) ((ttsSpeed/100.0));
-            Log.d("pitchAndspeed",pitch+"/"+speed);
-            textToSpeech.setPitch(pitch);
-            textToSpeech.setSpeechRate(speed);
-            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
-        }else
-            Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
-    }
 
-
-    // Long Click을 처리할  Runnable 입니다.
+            // Long Click을 처리할  Runnable 입니다.
     class CheckForLongPress implements Runnable {
 
         public void run() {
@@ -408,4 +318,61 @@ public class ImageAndTextView extends AppCompatActivity {
         return Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
     }
 
+    //image클릭시
+    private void PlayAndCancel(String path){
+        if(starting==0){
+            mMediaPlayer = new MediaPlayer();
+            try {
+                mMediaPlayer.setDataSource(path);
+                mMediaPlayer.prepare();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }catch(NullPointerException e){
+                e.printStackTrace();
+            }catch (IllegalStateException e){
+                e.printStackTrace();
+            }
+            starting=1;
+        }
+        if(mPlayAndCancelCheck ==true && starting==1) {
+
+            mAudioDuration = mMediaPlayer.getDuration();
+            mAudioSeekBar.setMax(mAudioDuration);
+            mAudioSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if(fromUser)
+                        mMediaPlayer.seekTo(progress);
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+            mMediaPlayer.start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(mMediaPlayer.isPlaying()){
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        mAudioSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
+                    }
+                }
+            }).start();
+            mPlayAndCancelCheck =false;
+        }
+        else if(mPlayAndCancelCheck ==false && starting==1){
+            Log.e("녹음파일 재생 중지","중지");
+            if (mMediaPlayer != null) {
+                mIsPause =true;
+                mMediaPlayer.pause();
+            }
+            mPlayAndCancelCheck =true;
+        }
+    }
 }

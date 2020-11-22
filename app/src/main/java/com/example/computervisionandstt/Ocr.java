@@ -70,6 +70,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class Ocr extends AppCompatActivity {
@@ -251,20 +252,7 @@ public class Ocr extends AppCompatActivity {
         ttsStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textToSpeech=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(int status) {
-                        if(status==TextToSpeech.SUCCESS){
-                            int result=textToSpeech.setLanguage(Locale.KOREA);
-                            if(result==TextToSpeech.LANG_MISSING_DATA || result== TextToSpeech.LANG_NOT_SUPPORTED)
-                                Log.d("TTS","언어미지원");
-                            else
-                                speackOut();
-                        }else
-                            Log.d("TTS","초기화 실패");
-                    }
-                });
-                speackOut();
+                setTTS(1);
             }
         });
 
@@ -476,19 +464,44 @@ public class Ocr extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-            }
+
+                //음성성파일 저장
+                File voiceFile=new File(createFolder,"ttsAudio.mp3");
+                if(textToSpeech==null) {
+                    setTTS(0);
+                }
+
+                textToSpeech.synthesizeToFile((CharSequence)receivedContents,null,voiceFile,null);
+           }
             return null;
         }
     }
 
+
+    //flag가 1일때만 speak
+    //tts를 실행시키지 않고 저장을 할 때 tts가 null인 경우를 방지
+    private void setTTS(int flag){
+        textToSpeech=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status==TextToSpeech.SUCCESS){
+                    int result=textToSpeech.setLanguage(Locale.KOREA);
+                    if(result==TextToSpeech.LANG_MISSING_DATA || result== TextToSpeech.LANG_NOT_SUPPORTED)
+                        Log.d("TTS","언어미지원");
+                    else
+                        if(flag==1) speackOut();
+                }else
+                    Log.d("TTS","초기화 실패");
+            }
+        });
+        if(flag==1) speackOut();
+    }
     //tts
     private void speackOut(){
         CharSequence charSequence=ocrImageToText.getText();
         if(charSequence!=null){
-            Log.d("pitchAndspeed",ttsPitch+"/"+ttsSpeed);
             float pitch=(float) ((ttsPitch/100.0));
             float speed=(float) ((ttsSpeed/100.0));
-            Log.d("pitchAndspeed",pitch+"/"+speed);
             textToSpeech.setPitch(pitch);
             textToSpeech.setSpeechRate(speed);
             textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
