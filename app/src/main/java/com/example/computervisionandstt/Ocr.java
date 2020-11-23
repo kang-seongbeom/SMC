@@ -470,8 +470,10 @@ public class Ocr extends AppCompatActivity {
                 if(textToSpeech==null) {
                     setTTS(0);
                 }
-
-                textToSpeech.synthesizeToFile((CharSequence)receivedContents,null,voiceFile,null);
+                Bundle audioBundleTts = new Bundle();
+                audioBundleTts.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"tTs");
+                Log.d("audioBundleTts",audioBundleTts.toString());
+                textToSpeech.synthesizeToFile((CharSequence)receivedContents,audioBundleTts,voiceFile,TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
            }
             return null;
         }
@@ -504,7 +506,10 @@ public class Ocr extends AppCompatActivity {
             float speed=(float) ((ttsSpeed/100.0));
             textToSpeech.setPitch(pitch);
             textToSpeech.setSpeechRate(speed);
-            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
+            Bundle bundleTts = new Bundle();
+            bundleTts.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tTs");
+            Log.d("audioBundleTts",bundleTts.toString());
+            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,bundleTts,TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
 
