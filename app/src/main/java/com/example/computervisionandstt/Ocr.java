@@ -27,6 +27,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -95,6 +96,9 @@ public class Ocr extends AppCompatActivity {
     //tts pitch and speed
     private int ttsPitch =50;   //0~100
     private int ttsSpeed =100; //0~200
+
+    private static final String UTTERANCE_ID = "id1";
+    Bundle bundleTts;
 
     @Override
     protected void onStart() {
@@ -252,7 +256,7 @@ public class Ocr extends AppCompatActivity {
         ttsStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setTTS(1);
+                setTTS();
             }
         });
 
@@ -464,25 +468,17 @@ public class Ocr extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-
-                //음성성파일 저장
-                File voiceFile=new File(createFolder,"ttsAudio.mp3");
-                if(textToSpeech==null) {
-                    setTTS(0);
+                if(!bundleTts.equals(Bundle.EMPTY)){
+                    Log.d("empty","check");
+                    textToSpeech.synthesizeToFile((CharSequence)receivedContents,bundleTts, new File(createFolder,"audio.wav"),TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
                 }
-                Bundle audioBundleTts = new Bundle();
-                audioBundleTts.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"tTs");
-                Log.d("audioBundleTts",audioBundleTts.toString());
-                textToSpeech.synthesizeToFile((CharSequence)receivedContents,audioBundleTts,voiceFile,TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
            }
             return null;
         }
     }
 
 
-    //flag가 1일때만 speak
-    //tts를 실행시키지 않고 저장을 할 때 tts가 null인 경우를 방지
-    private void setTTS(int flag){
+    private void setTTS(){
         textToSpeech=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -491,25 +487,40 @@ public class Ocr extends AppCompatActivity {
                     if(result==TextToSpeech.LANG_MISSING_DATA || result== TextToSpeech.LANG_NOT_SUPPORTED)
                         Log.d("TTS","언어미지원");
                     else
-                        if(flag==1) speackOut();
+                        speackOut();
                 }else
                     Log.d("TTS","초기화 실패");
             }
         });
-        if(flag==1) speackOut();
     }
     //tts
     private void speackOut(){
         CharSequence charSequence=ocrImageToText.getText();
         if(charSequence!=null){
+            textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Started reading " , Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Finished Speaking " , Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Error with " , Toast.LENGTH_SHORT).show());
+                }
+            });
             float pitch=(float) ((ttsPitch/100.0));
             float speed=(float) ((ttsSpeed/100.0));
             textToSpeech.setPitch(pitch);
             textToSpeech.setSpeechRate(speed);
-            Bundle bundleTts = new Bundle();
-            bundleTts.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tTs");
-            Log.d("audioBundleTts",bundleTts.toString());
+            bundleTts = new Bundle();
+            bundleTts.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id1");
             textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,bundleTts,TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
+            textToSpeech.playSilentUtterance(1000,TextToSpeech.QUEUE_ADD,UTTERANCE_ID);
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
 
