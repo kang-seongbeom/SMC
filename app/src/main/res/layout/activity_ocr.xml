@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
+    
 
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/ocrImage"

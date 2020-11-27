@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -52,6 +53,7 @@ public class ImageAndTextView extends AppCompatActivity {
     private int degree=0;
     private String path;
     SubsamplingScaleImageView savedImage;
+    private TextToSpeech textToSpeech;
 
     // 시작 위치를 저장을 위한 변수
     private float mLastMotionX = 0;
@@ -66,6 +68,9 @@ public class ImageAndTextView extends AppCompatActivity {
 
     private Handler mHandler = null;
 
+    private float ttsPitch=(float)50.0;
+    private float ttsSpeed=(float)100.0;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,7 @@ public class ImageAndTextView extends AppCompatActivity {
         savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
-        ImageView ttsButton = findViewById(R.id.ttsStart);
+        ImageView ttsButton = findViewById(R.id.ttsButton);
         ImageView roateButton=findViewById(R.id.imageRotate);
         LinearLayout linearView = findViewById(R.id.linearView);
 
@@ -100,16 +105,7 @@ public class ImageAndTextView extends AppCompatActivity {
         ttsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String mIWantPlayAudio = path +"/"+ "ttsAudio.3gp";
-                PlayAndCancel(mIWantPlayAudio);
-                if(mPlayAndCancelCheck ==true) {
-                    ttsButton.setImageDrawable(getResources().
-                            getDrawable(R.drawable.ic_baseline_play_circle_filled_24, getApplicationContext().getTheme()));
-                }
-                else{
-                    ttsButton.setImageDrawable(getResources().
-                            getDrawable(R.drawable.ic_baseline_pause_circle_filled_24, getApplicationContext().getTheme()));
-                }
+                setTTS();
             }
         });
 
@@ -250,16 +246,6 @@ public class ImageAndTextView extends AppCompatActivity {
         }
     }
 
-    //tts
-    private void speackOut() {
-        CharSequence charSequence = savedText.getText();
-        if (charSequence != null) {
-            textToSpeech.setPitch((float) 0.6);
-            textToSpeech.setSpeechRate((float) 1.0);
-            textToSpeech.speak(charSequence, TextToSpeech.QUEUE_FLUSH, null, "id1");
-        } else
-            Toast.makeText(getApplicationContext(), "이미지 분석을 해주세요!", Toast.LENGTH_SHORT).show();
-    }
 
 
             // Long Click을 처리할  Runnable 입니다.
@@ -380,61 +366,47 @@ public class ImageAndTextView extends AppCompatActivity {
         return Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
     }
 
-    //image클릭시
-    private void PlayAndCancel(String path){
-        if(starting==0){
-            mMediaPlayer = new MediaPlayer();
-            try {
-                mMediaPlayer.setDataSource(path);
-                mMediaPlayer.prepare();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }catch(NullPointerException e){
-                e.printStackTrace();
-            }catch (IllegalStateException e){
-                e.printStackTrace();
+    private void setTTS(){
+        textToSpeech=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status==TextToSpeech.SUCCESS){
+                    int result=textToSpeech.setLanguage(Locale.KOREA);
+                    if(result==TextToSpeech.LANG_MISSING_DATA || result== TextToSpeech.LANG_NOT_SUPPORTED)
+                        Log.d("TTS","언어미지원");
+                    else
+                        speackOut();
+                }else
+                    Log.d("TTS","초기화 실패");
             }
-            starting=1;
-        }
-        if(mPlayAndCancelCheck ==true && starting==1) {
-
-            mAudioDuration = mMediaPlayer.getDuration();
-            mAudioSeekBar.setMax(mAudioDuration);
-            mAudioSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        });
+    }
+    //tts
+    private void speackOut(){
+        CharSequence charSequence=savedText.getText();
+        if(charSequence!=null){
+            textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if(fromUser)
-                        mMediaPlayer.seekTo(progress);
+                public void onStart(String utteranceId) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Started reading " , Toast.LENGTH_SHORT).show());
                 }
+
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {}
+                public void onDone(String utteranceId) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Finished Speaking " , Toast.LENGTH_SHORT).show());
+                }
+
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
+                public void onError(String utteranceId) {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Error with " , Toast.LENGTH_SHORT).show());
+                }
             });
-            mMediaPlayer.start();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(mMediaPlayer.isPlaying()){
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        mAudioSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
-                    }
-                }
-            }).start();
-            mPlayAndCancelCheck =false;
-        }
-        else if(mPlayAndCancelCheck ==false && starting==1){
-            Log.e("녹음파일 재생 중지","중지");
-            if (mMediaPlayer != null) {
-                mIsPause =true;
-                mMediaPlayer.pause();
-            }
-            mPlayAndCancelCheck =true;
-        }
+            float pitch=(float) ((ttsPitch/100.0));
+            float speed=(float) ((ttsSpeed/100.0));
+            textToSpeech.setPitch(pitch);
+            textToSpeech.setSpeechRate(speed);
+            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
+        }else
+            Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
     }
 }

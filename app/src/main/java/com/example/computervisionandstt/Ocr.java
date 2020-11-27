@@ -98,6 +98,9 @@ public class Ocr extends AppCompatActivity {
     private static final String UTTERANCE_ID = "TextToSpeech.Engine.KEY";
     Bundle bundleTts;
 
+    private float ttsPitch=(float)50.0;
+    private float ttsSpeed=(float)100.0;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -383,10 +386,6 @@ public class Ocr extends AppCompatActivity {
                     }
                 }
 
-                File audioFile=new File(createFilePath,"audio.wav");
-                textToSpeech.synthesizeToFile((CharSequence)"receivedContents",null, audioFile,receivedFileName);
-
-
            }
             return null;
         }
@@ -412,7 +411,6 @@ public class Ocr extends AppCompatActivity {
     private void speackOut(){
         CharSequence charSequence=ocrImageToText.getText();
         if(charSequence!=null){
-<<<<<<< HEAD
             textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
                 public void onStart(String utteranceId) {
@@ -433,14 +431,7 @@ public class Ocr extends AppCompatActivity {
             float speed=(float) ((ttsSpeed/100.0));
             textToSpeech.setPitch(pitch);
             textToSpeech.setSpeechRate(speed);
-            bundleTts = new Bundle();
-            bundleTts.putString(UTTERANCE_ID, TextToSpeech.Engine.KEY_PARAM_PAN);
-            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,null);
-=======
-            textToSpeech.setPitch((float)0.6);
-            textToSpeech.setSpeechRate((float)1.0);
             textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
->>>>>>> parent of 442c34a... setting
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
     }
