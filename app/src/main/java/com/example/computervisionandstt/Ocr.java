@@ -468,11 +468,11 @@ public class Ocr extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                if(!bundleTts.equals(Bundle.EMPTY)){
-                    Log.d("empty",createFilePath);
-                    textToSpeech.synthesizeToFile((CharSequence)receivedContents,bundleTts.getBundle(UTTERANCE_ID), new File(createFolder,"audio.mp3"),TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
 
-                }
+                File audioFile=new File(createFilePath,"audio.wav");
+                textToSpeech.synthesizeToFile((CharSequence)"receivedContents",null, audioFile,receivedFileName);
+
+
            }
             return null;
         }
@@ -520,7 +520,7 @@ public class Ocr extends AppCompatActivity {
             textToSpeech.setSpeechRate(speed);
             bundleTts = new Bundle();
             bundleTts.putString(UTTERANCE_ID, TextToSpeech.Engine.KEY_PARAM_PAN);
-            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,bundleTts.getBundle(UTTERANCE_ID),TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
+            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,null);
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
 
