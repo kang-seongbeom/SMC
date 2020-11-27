@@ -97,7 +97,7 @@ public class Ocr extends AppCompatActivity {
     private int ttsPitch =50;   //0~100
     private int ttsSpeed =100; //0~200
 
-    private static final String UTTERANCE_ID = "id1";
+    private static final String UTTERANCE_ID = "TextToSpeech.Engine.KEY";
     Bundle bundleTts;
 
     @Override
@@ -469,8 +469,9 @@ public class Ocr extends AppCompatActivity {
                     }
                 }
                 if(!bundleTts.equals(Bundle.EMPTY)){
-                    Log.d("empty","check");
-                    textToSpeech.synthesizeToFile((CharSequence)receivedContents,bundleTts, new File(createFolder,"audio.wav"),TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
+                    Log.d("empty",createFilePath);
+                    textToSpeech.synthesizeToFile((CharSequence)receivedContents,bundleTts.getBundle(UTTERANCE_ID), new File(createFolder,"audio.mp3"),TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
+
                 }
            }
             return null;
@@ -518,9 +519,8 @@ public class Ocr extends AppCompatActivity {
             textToSpeech.setPitch(pitch);
             textToSpeech.setSpeechRate(speed);
             bundleTts = new Bundle();
-            bundleTts.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id1");
-            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,bundleTts,TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
-            textToSpeech.playSilentUtterance(1000,TextToSpeech.QUEUE_ADD,UTTERANCE_ID);
+            bundleTts.putString(UTTERANCE_ID, TextToSpeech.Engine.KEY_PARAM_PAN);
+            textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,bundleTts.getBundle(UTTERANCE_ID),TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
 
