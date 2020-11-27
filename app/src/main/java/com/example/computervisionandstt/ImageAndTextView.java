@@ -4,9 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.exifinterface.media.ExifInterface;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -23,14 +21,12 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,12 +53,6 @@ public class ImageAndTextView extends AppCompatActivity {
     private String path;
     SubsamplingScaleImageView savedImage;
 
-    private MediaPlayer mMediaPlayer;
-    private int mAudioDuration;
-    private int starting=0;
-    public boolean mPlayAndCancelCheck =true, mIsPause=false;
-    private SeekBar mAudioSeekBar;
-
     // 시작 위치를 저장을 위한 변수
     private float mLastMotionX = 0;
     private float mLastMotionY = 0;
@@ -82,13 +72,13 @@ public class ImageAndTextView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_and_text_view);
 
+
         savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
         ImageView ttsButton = findViewById(R.id.ttsStart);
         ImageView roateButton=findViewById(R.id.imageRotate);
         LinearLayout linearView = findViewById(R.id.linearView);
-        ImageView settingImage=findViewById(R.id.settingImage);
 
         //스크롤
         savedText.setMovementMethod(new ScrollingMovementMethod());
@@ -101,14 +91,12 @@ public class ImageAndTextView extends AppCompatActivity {
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 savedImage.setImage(ImageSource.bitmap(mBitmap));
             }
-
+            //Glide.with(this).load(path + "/" + "image.jpg").into(R.drawable.ic_baseline_remove_24);
             savedText.setText(ReadTextFile(path + "/" + "TTStext.txt"));
         } else {
             Log.d("pathing", "nope");
         }
 
-
-        mAudioSeekBar = (SeekBar) findViewById(R.id.AudioSeekBar) ;
         ttsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,26 +158,24 @@ public class ImageAndTextView extends AppCompatActivity {
                         final int deltaX = Math.abs((int) (mLastMotionX - x));
                         final int deltaY = Math.abs((int) (mLastMotionY - y));
 
-                        currentHeight = savedImage.getHeight() + (int)y;
-                        if (currentHeight < linearView.getHeight() - 150) {
+                        currentHeight = savedImage.getHeight() + (int) y;
+                        if (currentHeight < linearView.getHeight() - 80) {
                             savedImage.getLayoutParams().height = currentHeight;
                             savedImage.requestLayout();
 
-//                            //SubsamplingScaleImageView가 이미지 자체가 줄어들지 않은 버그가 있음
-                           if(currentHeight%3==0 && y<0)
+                            //화면을 키우다 보면 화질이 나빠지기 때문에
+                            //비트맵으로 디코딩 몫의 숫자를 작게하면 너무 끊김김
+                           if(currentHeight%150==0)
                                 //savedImage.setImageBitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),0));
                                if (path != null) {
                                    File mfile = new File(path + "/" + "image.jpg");
                                    if (mfile.exists()) {
                                        savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree)));
-                                  }
+                                   }
                                }
 
-
-
-                            Log.d("currentHeight",currentHeight+"");
-
                             savedText.getLayoutParams().height = savedText.getHeight() + (int) y;
+                            savedImage.requestLayout();
                             savedText.requestLayout();
                         }
 
@@ -256,11 +242,23 @@ public class ImageAndTextView extends AppCompatActivity {
 
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
+    protected void onDestroy() {
+        super.onDestroy();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
         }
+    }
+
+    //tts
+    private void speackOut() {
+        CharSequence charSequence = savedText.getText();
+        if (charSequence != null) {
+            textToSpeech.setPitch((float) 0.6);
+            textToSpeech.setSpeechRate((float) 1.0);
+            textToSpeech.speak(charSequence, TextToSpeech.QUEUE_FLUSH, null, "id1");
+        } else
+            Toast.makeText(getApplicationContext(), "이미지 분석을 해주세요!", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -311,7 +309,7 @@ public class ImageAndTextView extends AppCompatActivity {
         //Toast.makeText(ImageAndTextView.this, "One Click OK!!", Toast.LENGTH_SHORT).show();
     }
 
-    private Bitmap resbize(Context context, Uri uri, int resize) {
+    private Bitmap resize(Context context, Uri uri, int resize) {
         Bitmap resizeBitmap = null;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
