@@ -9,8 +9,7 @@
         android:text="setPitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginBottom="5dp"/>
     <SeekBar
         android:id="@+id/setPitchSeekBar"
         android:layout_width="match_parent"
@@ -25,8 +24,7 @@
         android:text="setSpeechRate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginBottom="5dp"/>
     <SeekBar
         android:id="@+id/setSpeechRateSeekBar"
         android:layout_width="match_parent"

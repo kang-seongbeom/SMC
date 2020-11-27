@@ -116,7 +116,6 @@ public class Ocr extends AppCompatActivity {
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
         //버튼
-        LinearLayout toFileView=findViewById(R.id.toFileView);
         ImageView settingImage=findViewById(R.id.settingImage);
         ImageView getImageButton=findViewById(R.id.getImageButton);
         ImageView captureButton=findViewById(R.id.captureButton);
@@ -137,15 +136,6 @@ public class Ocr extends AppCompatActivity {
         mCategoryArrayList.set(0,"기본 카테고리");
         setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
 
-        //FileView로 이동
-        toFileView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),FileView.class);
-                startActivity(intent);
-            }
-        });
-
         //setting
         settingImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +143,8 @@ public class Ocr extends AppCompatActivity {
                 LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout settingView = (LinearLayout) vi.inflate(R.layout.setting_seekbar, null);
 
+                final TextView setPitchText=settingView.findViewById(R.id.setPitchText);
+                final TextView setSpeechRateText=settingView.findViewById(R.id.setSpeechRateText);
                 final SeekBar setPitchSeekBar=settingView.findViewById(R.id.setPitchSeekBar);
                 final SeekBar setSpeechRateSeekBar=settingView.findViewById(R.id.setSpeechRateSeekBar);
 
@@ -407,9 +399,7 @@ public class Ocr extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             Toast.makeText(getApplicationContext(),"저장완료!!",Toast.LENGTH_SHORT).show();
-            Intent mRestartIntent = getIntent();
-            finish();
-            startActivity(mRestartIntent);
+            onBackPressed();
             super.onPostExecute(aVoid);
         }
 

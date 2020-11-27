@@ -16,7 +16,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:src="@drawable/ic_baseline_settings_applications_24"
+            android:src="@drawable/ic_baseline_settings_24"
             android:clickable="true"/>
 
     </LinearLayout>

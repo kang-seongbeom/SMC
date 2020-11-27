@@ -99,7 +99,7 @@ public class ImageAndTextView extends AppCompatActivity {
             File imgFile = new  File(path + "/" + "image.jpg");
             if(imgFile.exists()){
                 Bitmap mBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree)));
+                savedImage.setImage(ImageSource.bitmap(mBitmap));
             }
 
             savedText.setText(ReadTextFile(path + "/" + "TTStext.txt"));
@@ -129,7 +129,7 @@ public class ImageAndTextView extends AppCompatActivity {
         roateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                degree-=90;
+                degree+=90;
                 if (path != null) {
                     File mfile = new File(path + "/" + "image.jpg");
                     if (mfile.exists()) {
@@ -311,6 +311,70 @@ public class ImageAndTextView extends AppCompatActivity {
         //Toast.makeText(ImageAndTextView.this, "One Click OK!!", Toast.LENGTH_SHORT).show();
     }
 
+    private Bitmap resbize(Context context, Uri uri, int resize) {
+        Bitmap resizeBitmap = null;
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        try {
+            BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, options); // 1번
+
+            int width = options.outWidth;
+            int height = options.outHeight;
+            int samplesize = 1;
+
+            while (true) {//2번
+                if (width / 2 < resize || height / 2 < resize)
+                    break;
+                width /= 2;
+                height /= 2;
+                samplesize *= 2;
+            }
+
+            options.inSampleSize = samplesize;
+            Bitmap bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, options); //3번
+            resizeBitmap = bitmap;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return resizeBitmap;
+    }
+
+    public int getOrientationOfImage(String filepath) {
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(filepath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
+
+        if (orientation != -1) {
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return 90;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return 180;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return 270;
+            }
+        }
+        return 0;
+    }
+
+    public Bitmap getRotatedBitmap(Bitmap bitmap, int degrees) throws Exception {
+        if(bitmap == null) return null;
+        if (degrees == 0) return bitmap;
+
+        Matrix m = new Matrix();
+        m.setRotate(degrees, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+    }
 
     private Bitmap rotateImage(Bitmap bitmap,float degree){
         Matrix matrix=new Matrix();
