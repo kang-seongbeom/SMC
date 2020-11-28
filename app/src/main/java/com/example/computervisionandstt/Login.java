@@ -53,6 +53,9 @@ public class Login extends AppCompatActivity {
     //KakaoSessionCallback 클래스에서 카카오 로그인시 Login화면을 finish하기 위한 변수
     public static Activity loginActivity;
 
+    ///뒤로가기2번 눌르면 앱종료
+    private BackPressCloseHandler backPressCloseHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +123,9 @@ public class Login extends AppCompatActivity {
                 session.open(AuthType.KAKAO_LOGIN_ALL, Login.this);
             }
         });
+
+        //뒤로가기2번 누르면 종료
+        backPressCloseHandler = new BackPressCloseHandler(this);
     }
 
     @Override
@@ -237,5 +243,11 @@ public class Login extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Session.getCurrentSession().removeCallback(sessionCallback);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        backPressCloseHandler.onBackPressed();
     }
 }

@@ -43,7 +43,7 @@ public class FileView extends AppCompatActivity {
     private ArrayList<GetSet> mVariable = new ArrayList<>();
     private File[] mFiles;
 
-    private final String sharedPreferenceKey="saveArrayListToSharedPreference";
+    private final String sharedPreferenceKey = "saveArrayListToSharedPreference";
     private ArrayList<String> filesCategoryList = new ArrayList<>();
 
     @Override
@@ -88,34 +88,37 @@ public class FileView extends AppCompatActivity {
             }
         }));
 
-        Context context=getApplicationContext();
-        String path =  context.getFilesDir()+ "/";
+        Context context = getApplicationContext();
+        String path = context.getFilesDir() + "/";
         File directory = new File(path);
         mFiles = directory.listFiles();
+        Log.d("mFiles", mFiles.toString());
+        if (directory.exists()) {
+            for (int i = 0; i < (mFiles.length) && (!mFiles[i].isFile()); i++) {
+                String name = mFiles[i].getName();
+                String[] result = name.split("#");
+                filesCategoryList.add(result[0]);
+                filesNameList.add(result[1]);
+                filesDateList.add(result[2]);
+                String tmp = result[2];
+                String mDate = tmp.substring(0, 11);
+                String mHour = tmp.substring(11, 13);
+                String mMinute = tmp.substring(13, 15);
+                String mSecond = tmp.substring(15, 17);
+                mVariable.add(new GetSet("카테고리:" + filesCategoryList.get(i),
+                        "파일이름 : " + "[" + filesCategoryList.get(i) + "]" + filesNameList.get(i),
+                        "날짜:" + mDate + mHour + "시" + mMinute + "분" + mSecond + "초"));
+                mArrayList.add(mVariable.get(i));
 
-        for (int i = 0; i < mFiles.length; i++) {
-            String name = mFiles[i].getName();
-            String[] result = name.split("#");
-            filesCategoryList.add(result[0]);
-            filesNameList.add(result[1]);
-            filesDateList.add(result[2]);
-            String tmp = result[2];
-            String mDate = tmp.substring(0, 11);
-            String mHour = tmp.substring(11, 13);
-            String mMinute = tmp.substring(13, 15);
-            String mSecond = tmp.substring(15, 17);
-            mVariable.add(new GetSet("카테고리:" + filesCategoryList.get(i),
-                    "파일이름 : " + "[" + filesCategoryList.get(i) + "]" + filesNameList.get(i),
-                    "날짜:" + mDate + mHour + "시" + mMinute + "분" + mSecond + "초"));
-            mArrayList.add(mVariable.get(i));
+            }
         }
 
-        Spinner mCategorySpinner=findViewById(R.id.categorySpinner);
-        mCategotyList=new ArrayList<>();
-        Context mContext=getApplicationContext();
-        mCategotyList=getStringArrayPref(mContext,sharedPreferenceKey);
-        ArrayAdapter<String> mSpinnerAdapter=new ArrayAdapter<String>(getApplicationContext(),
-                R.layout.support_simple_spinner_dropdown_item,mCategotyList);
+        Spinner mCategorySpinner = findViewById(R.id.categorySpinner);
+        mCategotyList = new ArrayList<>();
+        Context mContext = getApplicationContext();
+        mCategotyList = getStringArrayPref(mContext, sharedPreferenceKey);
+        ArrayAdapter<String> mSpinnerAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                R.layout.support_simple_spinner_dropdown_item, mCategotyList);
         mSpinnerAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         mCategorySpinner.setAdapter(mSpinnerAdapter);
 
@@ -123,9 +126,9 @@ public class FileView extends AppCompatActivity {
         mCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(!mCategorySpinner.getSelectedItem().toString().equalsIgnoreCase("기본 카테고리")) {
+                if (!mCategorySpinner.getSelectedItem().toString().equalsIgnoreCase("기본 카테고리")) {
                     fileterCategoty(mCategorySpinner.getItemAtPosition(position).toString());
-                }else{
+                } else {
                     fileterCategoty("");
                 }
 
@@ -138,27 +141,27 @@ public class FileView extends AppCompatActivity {
 
 
         //'+'버튼을 눌렀을 시 카테고리를 추가 할 수 있도록 함
-        ImageView addCategoryOfFileView=findViewById(R.id.addCategoryOfFileView);
+        ImageView addCategoryOfFileView = findViewById(R.id.addCategoryOfFileView);
         addCategoryOfFileView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder mAddCategoryAlertofFileView = new AlertDialog.Builder(FileView.this);
-                EditText mAddCategoryEditTextofFileView=new EditText(FileView.this);
+                EditText mAddCategoryEditTextofFileView = new EditText(FileView.this);
                 mAddCategoryAlertofFileView.setMessage("카테고리 이름");
                 mAddCategoryAlertofFileView.setView(mAddCategoryEditTextofFileView);
                 mAddCategoryAlertofFileView.setPositiveButton("추가", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //카테고리 배열에 카테고리를 불러옴
-                        Context mContext=getApplicationContext();
+                        Context mContext = getApplicationContext();
                         mCategotyList.clear();
-                        mCategotyList=getStringArrayPref(mContext,sharedPreferenceKey);
+                        mCategotyList = getStringArrayPref(mContext, sharedPreferenceKey);
                         mCategotyList.add(mAddCategoryEditTextofFileView.getText().toString());
-                        setStringArrayPref(mContext,sharedPreferenceKey,mCategotyList);
+                        setStringArrayPref(mContext, sharedPreferenceKey, mCategotyList);
 
                         //카테고리 생성시 스피너가 클릭되지 않는 버그가 있어서 강제로 스피너 refresh
-                        ArrayAdapter<String> mCategoryArrayAdapter=new ArrayAdapter<String>(getApplicationContext(),
-                                R.layout.support_simple_spinner_dropdown_item,mCategotyList);
+                        ArrayAdapter<String> mCategoryArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                                R.layout.support_simple_spinner_dropdown_item, mCategotyList);
                         mCategoryArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                         mCategorySpinner.setAdapter(mCategoryArrayAdapter);
                     }
@@ -166,21 +169,21 @@ public class FileView extends AppCompatActivity {
                 mAddCategoryAlertofFileView.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.d("categoty","취소");
+                        Log.d("categoty", "취소");
                     }
                 });
-                AlertDialog mAddCategoryAlertDialogofFileView=mAddCategoryAlertofFileView.create();
+                AlertDialog mAddCategoryAlertDialogofFileView = mAddCategoryAlertofFileView.create();
                 mAddCategoryAlertDialogofFileView.show();
             }
         });
 
         ////'-'버튼을 눌렀을 시 카테고리를 삭제 할 수 있도록 함
-        ImageView subCategoryOfFileView=findViewById(R.id.subCategoryOfFileView);
+        ImageView subCategoryOfFileView = findViewById(R.id.subCategoryOfFileView);
         subCategoryOfFileView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder mDeleteCategoryAlertofFileView = new AlertDialog.Builder(FileView.this);
-                EditText mDeleteCategoryEditTextofFileView=new EditText(FileView.this);
+                EditText mDeleteCategoryEditTextofFileView = new EditText(FileView.this);
                 mDeleteCategoryAlertofFileView.setMessage("카테고리 삭제");
                 mDeleteCategoryAlertofFileView.setView(mDeleteCategoryEditTextofFileView);
                 mDeleteCategoryAlertofFileView.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
@@ -188,27 +191,27 @@ public class FileView extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         //카테고리 배열에 정보를 불러오고
                         //삭제할 카테고리 이름의 정보를 받아 일치하면 삭제
-                        String mDeleteCategoty=mDeleteCategoryEditTextofFileView.getText().toString();
-                        ArrayList<String> mGetCategory=new ArrayList<>();
-                        mGetCategory=getStringArrayPref(mContext,sharedPreferenceKey);
-                        for(int i=0;i<mGetCategory.size();i++){
-                            if(mDeleteCategoty.equals(mGetCategory.get(i))){
-                                if((mGetCategory.get(i)).equals("기본 카테고리")){
-                                    Toast.makeText(getApplicationContext(),"기본 카테고리는 삭제 할 수 없습니다.",Toast.LENGTH_SHORT).show();
+                        String mDeleteCategoty = mDeleteCategoryEditTextofFileView.getText().toString();
+                        ArrayList<String> mGetCategory = new ArrayList<>();
+                        mGetCategory = getStringArrayPref(mContext, sharedPreferenceKey);
+                        for (int i = 0; i < mGetCategory.size(); i++) {
+                            if (mDeleteCategoty.equals(mGetCategory.get(i))) {
+                                if ((mGetCategory.get(i)).equals("기본 카테고리")) {
+                                    Toast.makeText(getApplicationContext(), "기본 카테고리는 삭제 할 수 없습니다.", Toast.LENGTH_SHORT).show();
                                     break;
                                 }
                                 mGetCategory.remove(i);
-                                Toast.makeText(getApplicationContext(),"카테고리 삭제 성공!!",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "카테고리 삭제 성공!!", Toast.LENGTH_SHORT).show();
                                 break;
                             }
-                            if(i==(mGetCategory.size()-1)) {
+                            if (i == (mGetCategory.size() - 1)) {
                                 Toast.makeText(getApplicationContext(), "카테고리가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
                             }
                         }
                         //해당 삭제 정보를 sharedpreference에 저장
-                        setStringArrayPref(mContext,sharedPreferenceKey,mGetCategory);
-                        ArrayAdapter<String> mCategoryArrayAdapter=new ArrayAdapter<String>(getApplicationContext(),
-                                R.layout.support_simple_spinner_dropdown_item,mGetCategory);
+                        setStringArrayPref(mContext, sharedPreferenceKey, mGetCategory);
+                        ArrayAdapter<String> mCategoryArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                                R.layout.support_simple_spinner_dropdown_item, mGetCategory);
                         mCategoryArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                         mCategorySpinner.setAdapter(mCategoryArrayAdapter);
 
@@ -220,7 +223,7 @@ public class FileView extends AppCompatActivity {
 
                     }
                 });
-                AlertDialog mDeleteCategoryAlertDialogofFileView=mDeleteCategoryAlertofFileView.create();
+                AlertDialog mDeleteCategoryAlertDialogofFileView = mDeleteCategoryAlertofFileView.create();
                 mDeleteCategoryAlertDialogofFileView.show();
             }
         });
@@ -229,8 +232,8 @@ public class FileView extends AppCompatActivity {
     //뒤로가기버튼 활성화
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case android.R.id.home:{
+        switch (item.getItemId()) {
+            case android.R.id.home: {
                 finish();
                 return true;
             }
@@ -241,9 +244,9 @@ public class FileView extends AppCompatActivity {
     //파일 검색 icon
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.find_file_menu,menu);
-        MenuItem item=menu.findItem(R.id.search_file_icon);
-        SearchView searchView= (SearchView) item.getActionView();
+        getMenuInflater().inflate(R.menu.find_file_menu, menu);
+        MenuItem item = menu.findItem(R.id.search_file_icon);
+        SearchView searchView = (SearchView) item.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
         searchView.setQueryHint("파일 검색");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -254,9 +257,9 @@ public class FileView extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(!newText.equals("")) {
+                if (!newText.equals("")) {
                     fileterFile(newText);
-                }else{
+                } else {
                     fileterFile("");
                 }
                 return false;
@@ -266,20 +269,20 @@ public class FileView extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void fileterCategoty(String text){
-        ArrayList<GetSet> mFilteredList=new ArrayList<>();
-        for(GetSet item:mVariable){
-            if(item.getmCategory().toLowerCase().contains(text)){
+    private void fileterCategoty(String text) {
+        ArrayList<GetSet> mFilteredList = new ArrayList<>();
+        for (GetSet item : mVariable) {
+            if (item.getmCategory().toLowerCase().contains(text)) {
                 mFilteredList.add(item);
             }
         }
         mAdapter.filterList(mFilteredList);
     }
 
-    private void fileterFile(String text){
-        ArrayList<GetSet> mFilteredList=new ArrayList<>();
-        for(GetSet item:mVariable){
-            if(item.getName().toLowerCase().contains(text)){
+    private void fileterFile(String text) {
+        ArrayList<GetSet> mFilteredList = new ArrayList<>();
+        for (GetSet item : mVariable) {
+            if (item.getName().toLowerCase().contains(text)) {
                 mFilteredList.add(item);
             }
         }

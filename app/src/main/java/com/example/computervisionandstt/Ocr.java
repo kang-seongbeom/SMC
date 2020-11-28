@@ -96,9 +96,9 @@ public class Ocr extends AppCompatActivity {
     private ArrayList<String> mCategoryArrayList;
     private final String sharedPreferenceKey="saveArrayListToSharedPreference";
 
+    //뒤로가기2번 눌르면 앱종료
+    private BackPressCloseHandler backPressCloseHandler;
 
-    private static final String UTTERANCE_ID = "TextToSpeech.Engine.KEY";
-    Bundle bundleTts;
 
     private float ttsPitch=(float)50.0;
     private float ttsSpeed=(float)100.0;
@@ -114,37 +114,37 @@ public class Ocr extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ocr);
 
-        ocrImage=(SubsamplingScaleImageView)findViewById(R.id.ocrImage);
-        ocrImageToText=findViewById(R.id.ocrImageToText);
+        ocrImage = (SubsamplingScaleImageView) findViewById(R.id.ocrImage);
+        ocrImageToText = findViewById(R.id.ocrImageToText);
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
         //버튼
-        LinearLayout toFileView=findViewById(R.id.toFileView);
-        ImageView settingImage=findViewById(R.id.settingImage);
-        ImageView getImageButton=findViewById(R.id.getImageButton);
-        ImageView captureButton=findViewById(R.id.captureButton);
-        ImageView ocrStartButton=findViewById(R.id.ocrStartButton);
-        ImageView ttsStartButton=findViewById(R.id.ttsStartButton);
-        ImageView saveButton=findViewById(R.id.saveButton);
+        LinearLayout toFileView = findViewById(R.id.toFileView);
+        ImageView settingImage = findViewById(R.id.settingImage);
+        ImageView getImageButton = findViewById(R.id.getImageButton);
+        ImageView captureButton = findViewById(R.id.captureButton);
+        ImageView ocrStartButton = findViewById(R.id.ocrStartButton);
+        ImageView ttsStartButton = findViewById(R.id.ttsStartButton);
+        ImageView saveButton = findViewById(R.id.saveButton);
 
         //Linear
-        firstConstraintLayout=findViewById(R.id.firstConstraintLayout);
-        secondConstraintLayout=findViewById(R.id.secondConstraintLayout);
+        firstConstraintLayout = findViewById(R.id.firstConstraintLayout);
+        secondConstraintLayout = findViewById(R.id.secondConstraintLayout);
 
         //카테고리에 저장된 정보를 받아옴
         //카테고리 최상단은 항상 기본 카테고리
-        mCategoryArrayList=new ArrayList<>();
-        Context mContext=getApplicationContext();
-        mCategoryArrayList=getStringArrayPref(mContext,sharedPreferenceKey);
-        if(mCategoryArrayList.size()==0) mCategoryArrayList.add("tmp");
-        mCategoryArrayList.set(0,"기본 카테고리");
-        setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
+        mCategoryArrayList = new ArrayList<>();
+        Context mContext = getApplicationContext();
+        mCategoryArrayList = getStringArrayPref(mContext, sharedPreferenceKey);
+        if (mCategoryArrayList.size() == 0) mCategoryArrayList.add("tmp");
+        mCategoryArrayList.set(0, "기본 카테고리");
+        setStringArrayPref(mContext, sharedPreferenceKey, mCategoryArrayList);
 
         //toFileView
         toFileView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),FileView.class);
+                Intent intent = new Intent(getApplicationContext(), FileView.class);
                 startActivity(intent);
             }
         });
@@ -156,10 +156,10 @@ public class Ocr extends AppCompatActivity {
                 LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout settingView = (LinearLayout) vi.inflate(R.layout.setting_seekbar, null);
 
-                final TextView setPitchText=settingView.findViewById(R.id.setPitchText);
-                final TextView setSpeechRateText=settingView.findViewById(R.id.setSpeechRateText);
-                final SeekBar setPitchSeekBar=settingView.findViewById(R.id.setPitchSeekBar);
-                final SeekBar setSpeechRateSeekBar=settingView.findViewById(R.id.setSpeechRateSeekBar);
+                final TextView setPitchText = settingView.findViewById(R.id.setPitchText);
+                final TextView setSpeechRateText = settingView.findViewById(R.id.setSpeechRateText);
+                final SeekBar setPitchSeekBar = settingView.findViewById(R.id.setPitchSeekBar);
+                final SeekBar setSpeechRateSeekBar = settingView.findViewById(R.id.setSpeechRateSeekBar);
 
                 //기본 값
                 setPitchSeekBar.setProgress((int) ttsPitch);
@@ -167,12 +167,12 @@ public class Ocr extends AppCompatActivity {
 
                 //임시 저장 값
                 final float[] tmpPitch = {ttsPitch};
-                final float[] tmpSpeed={ttsSpeed};
+                final float[] tmpSpeed = {ttsSpeed};
 
                 setPitchSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        tmpPitch[0]=progress;
+                        tmpPitch[0] = progress;
                     }
 
                     @Override
@@ -189,7 +189,7 @@ public class Ocr extends AppCompatActivity {
                 setSpeechRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        tmpSpeed[0]=progress;
+                        tmpSpeed[0] = progress;
                     }
 
                     @Override
@@ -207,10 +207,10 @@ public class Ocr extends AppCompatActivity {
                 new AlertDialog.Builder(Ocr.this).setMessage("속도, 음높이 조절").setView(settingView).setPositiveButton("저장", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ttsPitch=tmpPitch[0];
-                        ttsSpeed=tmpSpeed[0];
-                        Log.d("pitch",ttsPitch+"");
-                        Log.d("speed",ttsSpeed+"");
+                        ttsPitch = tmpPitch[0];
+                        ttsSpeed = tmpSpeed[0];
+                        Log.d("pitch", ttsPitch + "");
+                        Log.d("speed", ttsSpeed + "");
                     }
                 }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
@@ -227,7 +227,7 @@ public class Ocr extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //cacheDirFileClear();
-                onAlbum( REQUEST_ALBUM );
+                onAlbum(REQUEST_ALBUM);
 
             }
         });
@@ -237,7 +237,7 @@ public class Ocr extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //cacheDirFileClear();
-                requestPermissions( new String[]{ Manifest.permission.CAMERA }, REQUEST_CAMERA );
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 
             }
         });
@@ -246,12 +246,12 @@ public class Ocr extends AppCompatActivity {
         ocrStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(cacheFilePath!=null){
-                    Bitmap bitmap= BitmapFactory.decodeFile(cacheFilePath);
-                    ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
-                    final ByteArrayInputStream inputStream=new ByteArrayInputStream(outputStream.toByteArray());
-                    Ocr.ImageAnalytics imageAnalytics=new Ocr.ImageAnalytics();
+                if (cacheFilePath != null) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(cacheFilePath);
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    final ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+                    Ocr.ImageAnalytics imageAnalytics = new Ocr.ImageAnalytics();
                     imageAnalytics.execute(inputStream);
                 }
             }
@@ -274,10 +274,10 @@ public class Ocr extends AppCompatActivity {
                 alertDialog.setMessage("파일이름");
 
                 //저장 팝업창은 dialog_spinner을 사용
-                View mView=getLayoutInflater().inflate(R.layout.dialog_spinner,null);
-                final EditText mSaveFileName=(EditText) mView.findViewById(R.id.saveFileName);
-                final ImageView addCategory=(ImageView)mView.findViewById(R.id.addCategory);
-                final Spinner dialogSpinner=(Spinner)mView.findViewById(R.id.dialogSpinner);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_spinner, null);
+                final EditText mSaveFileName = (EditText) mView.findViewById(R.id.saveFileName);
+                final ImageView addCategory = (ImageView) mView.findViewById(R.id.addCategory);
+                final Spinner dialogSpinner = (Spinner) mView.findViewById(R.id.dialogSpinner);
 
                 //dialog창에 구성요소들 추가
                 alertDialog.setView(mSaveFileName);
@@ -287,9 +287,9 @@ public class Ocr extends AppCompatActivity {
 
                 //카테고리 배열에 카테고리를 불러옴
                 mCategoryArrayList.clear();
-                mCategoryArrayList=getStringArrayPref(mContext,sharedPreferenceKey);
-                ArrayAdapter<String> mArrayAdapter=new ArrayAdapter<String>(getApplicationContext(),
-                        R.layout.support_simple_spinner_dropdown_item,mCategoryArrayList);
+                mCategoryArrayList = getStringArrayPref(mContext, sharedPreferenceKey);
+                ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                        R.layout.support_simple_spinner_dropdown_item, mCategoryArrayList);
                 mArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                 dialogSpinner.setAdapter(mArrayAdapter);
 
@@ -298,7 +298,7 @@ public class Ocr extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         AlertDialog.Builder mCategoryAlert = new AlertDialog.Builder(Ocr.this);
-                        EditText addCategoryEditText=new EditText(Ocr.this);
+                        EditText addCategoryEditText = new EditText(Ocr.this);
                         mCategoryAlert.setMessage("카테고리 이름");
                         mCategoryAlert.setView(addCategoryEditText);
                         mCategoryAlert.setPositiveButton("추가", new DialogInterface.OnClickListener() {
@@ -306,13 +306,13 @@ public class Ocr extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 //카테고리배열에 카테고리정보를 불러옴
                                 mCategoryArrayList.clear();
-                                mCategoryArrayList=getStringArrayPref(mContext,sharedPreferenceKey);
+                                mCategoryArrayList = getStringArrayPref(mContext, sharedPreferenceKey);
                                 mCategoryArrayList.add(addCategoryEditText.getText().toString());
-                                setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
+                                setStringArrayPref(mContext, sharedPreferenceKey, mCategoryArrayList);
 
                                 //카테고리 생성시 스피너가 클릭되지 않는 버그가 있어서 강제로 스피너 refresh
-                                ArrayAdapter<String> mCategoryArrayAdapter=new ArrayAdapter<String>(getApplicationContext(),
-                                        R.layout.support_simple_spinner_dropdown_item,mCategoryArrayList);
+                                ArrayAdapter<String> mCategoryArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                                        R.layout.support_simple_spinner_dropdown_item, mCategoryArrayList);
                                 mCategoryArrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                                 dialogSpinner.setAdapter(mCategoryArrayAdapter);
                             }
@@ -322,7 +322,7 @@ public class Ocr extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         });
-                        AlertDialog mCategoryAlertDialog=mCategoryAlert.create();
+                        AlertDialog mCategoryAlertDialog = mCategoryAlert.create();
                         mCategoryAlertDialog.show();
                     }
                 });
@@ -331,12 +331,12 @@ public class Ocr extends AppCompatActivity {
                 alertDialog.setPositiveButton("저장", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        SaveFile checkTypesTask=new SaveFile();
-                        String fileName=mSaveFileName.getText().toString();
-                        String Contents=ocrImageToText.getText().toString();
-                        String mTmpCategory=dialogSpinner.getSelectedItem().toString();
-                        GetSet getSet=new GetSet();
-                        getSet.setFileName(mTmpCategory+"#"+fileName);
+                        SaveFile checkTypesTask = new SaveFile();
+                        String fileName = mSaveFileName.getText().toString();
+                        String Contents = ocrImageToText.getText().toString();
+                        String mTmpCategory = dialogSpinner.getSelectedItem().toString();
+                        GetSet getSet = new GetSet();
+                        getSet.setFileName(mTmpCategory + "#" + fileName);
                         getSet.setContents(Contents);
                         checkTypesTask.execute((GetSet) getSet);
                     }
@@ -345,16 +345,18 @@ public class Ocr extends AppCompatActivity {
                 alertDialog.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(),"저장을 취소 했습니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "저장을 취소 했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
                 alertDialog.show();
             }
         });
 
-
-
+        //뒤로가기2번 누르면 종료
+        backPressCloseHandler = new BackPressCloseHandler(this);
     }
+
+
 
     //이미지의 텍스트 추출
     public class ImageAnalytics extends AsyncTask<InputStream,String,String> {
@@ -917,4 +919,12 @@ public class Ocr extends AppCompatActivity {
         }
         return urls;
     }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        backPressCloseHandler.onBackPressed();
+    }
+
+
 }
