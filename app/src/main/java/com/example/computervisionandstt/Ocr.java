@@ -32,6 +32,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -39,6 +40,7 @@ import android.widget.EditText;
 
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -117,6 +119,8 @@ public class Ocr extends AppCompatActivity {
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
         //버튼
+        LinearLayout toFileView=findViewById(R.id.toFileView);
+        ImageView settingImage=findViewById(R.id.settingImage);
         ImageView getImageButton=findViewById(R.id.getImageButton);
         ImageView captureButton=findViewById(R.id.captureButton);
         ImageView ocrStartButton=findViewById(R.id.ocrStartButton);
@@ -136,6 +140,87 @@ public class Ocr extends AppCompatActivity {
         mCategoryArrayList.set(0,"기본 카테고리");
         setStringArrayPref(mContext,sharedPreferenceKey,mCategoryArrayList);
 
+        //toFileView
+        toFileView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getApplicationContext(),FileView.class);
+                startActivity(intent);
+            }
+        });
+
+        //setting
+        settingImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout settingView = (LinearLayout) vi.inflate(R.layout.setting_seekbar, null);
+
+                final TextView setPitchText=settingView.findViewById(R.id.setPitchText);
+                final TextView setSpeechRateText=settingView.findViewById(R.id.setSpeechRateText);
+                final SeekBar setPitchSeekBar=settingView.findViewById(R.id.setPitchSeekBar);
+                final SeekBar setSpeechRateSeekBar=settingView.findViewById(R.id.setSpeechRateSeekBar);
+
+                //기본 값
+                setPitchSeekBar.setProgress((int) ttsPitch);
+                setSpeechRateSeekBar.setProgress((int) ttsSpeed);
+
+                //임시 저장 값
+                final float[] tmpPitch = {ttsPitch};
+                final float[] tmpSpeed={ttsSpeed};
+
+                setPitchSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tmpPitch[0]=progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                setSpeechRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tmpSpeed[0]=progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+
+                new AlertDialog.Builder(Ocr.this).setMessage("속도, 음높이 조절").setView(settingView).setPositiveButton("저장", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ttsPitch=tmpPitch[0];
+                        ttsSpeed=tmpSpeed[0];
+                        Log.d("pitch",ttsPitch+"");
+                        Log.d("speed",ttsSpeed+"");
+                    }
+                }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+            }
+
+        });
 
         //getImageButton
         getImageButton.setOnClickListener(new View.OnClickListener() {
@@ -317,7 +402,7 @@ public class Ocr extends AppCompatActivity {
     }
 
     //파일저장
-    private class SaveFile extends AsyncTask<GetSet,Void,Void> {
+    public class SaveFile extends AsyncTask<GetSet,Void,Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -326,7 +411,9 @@ public class Ocr extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             Toast.makeText(getApplicationContext(),"저장완료!!",Toast.LENGTH_SHORT).show();
-            onBackPressed();
+            Intent mRestartIntent = getIntent();
+            finish();
+            startActivity(mRestartIntent);
             super.onPostExecute(aVoid);
         }
 

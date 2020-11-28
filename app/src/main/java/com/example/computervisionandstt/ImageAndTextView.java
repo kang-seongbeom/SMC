@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.exifinterface.media.ExifInterface;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -22,12 +24,14 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,7 +81,7 @@ public class ImageAndTextView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_and_text_view);
 
-
+        ImageView settingImage=findViewById(R.id.settingImage);
         savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
@@ -101,6 +105,80 @@ public class ImageAndTextView extends AppCompatActivity {
         } else {
             Log.d("pathing", "nope");
         }
+
+        //setting
+        //setting
+        settingImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout settingView = (LinearLayout) vi.inflate(R.layout.setting_seekbar, null);
+
+                final TextView setPitchText=settingView.findViewById(R.id.setPitchText);
+                final TextView setSpeechRateText=settingView.findViewById(R.id.setSpeechRateText);
+                final SeekBar setPitchSeekBar=settingView.findViewById(R.id.setPitchSeekBar);
+                final SeekBar setSpeechRateSeekBar=settingView.findViewById(R.id.setSpeechRateSeekBar);
+
+                //기본 값
+                setPitchSeekBar.setProgress((int) ttsPitch);
+                setSpeechRateSeekBar.setProgress((int) ttsSpeed);
+
+                //임시 저장 값
+                final float[] tmpPitch = {ttsPitch};
+                final float[] tmpSpeed={ttsSpeed};
+
+                setPitchSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tmpPitch[0]=progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                setSpeechRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tmpSpeed[0]=progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+
+                new AlertDialog.Builder(ImageAndTextView.this).setMessage("속도, 음높이 조절").setView(settingView).setPositiveButton("저장", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ttsPitch=tmpPitch[0];
+                        ttsSpeed=tmpSpeed[0];
+                        Log.d("pitch",ttsPitch+"");
+                        Log.d("speed",ttsSpeed+"");
+                    }
+                }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+            }
+
+        });
 
         ttsButton.setOnClickListener(new View.OnClickListener() {
             @Override

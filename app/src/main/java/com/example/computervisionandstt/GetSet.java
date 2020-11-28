@@ -8,8 +8,8 @@ public class GetSet {
     private String mCategory;
 
     public GetSet(){
-
     }
+
     public GetSet(String category,String name,String date){
         this.mCategory=category;
         this.name=name;

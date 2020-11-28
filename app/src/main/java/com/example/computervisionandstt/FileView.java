@@ -34,7 +34,7 @@ import org.json.JSONException;
 import java.io.File;
 import java.util.ArrayList;
 
-public class FileView extends AppCompatActivity  {
+public class FileView extends AppCompatActivity {
     private ArrayList<GetSet> mArrayList;
     private CustomAdapter mAdapter;
     private ArrayList<String> filesNameList = new ArrayList<>();
