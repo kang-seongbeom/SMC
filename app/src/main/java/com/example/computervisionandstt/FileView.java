@@ -35,7 +35,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class FileView extends AppCompatActivity {
-    private ArrayList<GetSet> mArrayList;
     private CustomAdapter mAdapter;
     private ArrayList<String> filesNameList = new ArrayList<>();
     private ArrayList<String> filesDateList = new ArrayList<>();
@@ -55,8 +54,7 @@ public class FileView extends AppCompatActivity {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-        mArrayList = new ArrayList<>();
-        mAdapter = new CustomAdapter(mArrayList);
+        mAdapter = new CustomAdapter(mVariable);
         mRecyclerView.setAdapter(mAdapter);
 
         //actionbar
@@ -94,22 +92,26 @@ public class FileView extends AppCompatActivity {
         mFiles = directory.listFiles();
         Log.d("mFiles", mFiles.toString());
         if (directory.exists()) {
-            for (int i = 0; i < (mFiles.length) && (!mFiles[i].isFile()); i++) {
+            for (int i = 0; i < (mFiles.length); i++) {
                 String name = mFiles[i].getName();
-                String[] result = name.split("#");
-                filesCategoryList.add(result[0]);
-                filesNameList.add(result[1]);
-                filesDateList.add(result[2]);
-                String tmp = result[2];
-                String mDate = tmp.substring(0, 11);
-                String mHour = tmp.substring(11, 13);
-                String mMinute = tmp.substring(13, 15);
-                String mSecond = tmp.substring(15, 17);
-                mVariable.add(new GetSet("카테고리:" + filesCategoryList.get(i),
-                        "파일이름 : " + "[" + filesCategoryList.get(i) + "]" + filesNameList.get(i),
-                        "날짜:" + mDate + mHour + "시" + mMinute + "분" + mSecond + "초"));
-                mArrayList.add(mVariable.get(i));
+                if(name.equals("generatefid.lock") ||
+                        name.equals("PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json")) {
+                    continue;
+                }else{
+                    String[] result = name.split("#");
+                    filesCategoryList.add(result[0]);
+                    filesNameList.add(result[1]);
+                    filesDateList.add(result[2]);
+                    String tmp = result[2];
+                    String mDate = tmp.substring(0, 11);
+                    String mHour = tmp.substring(11, 13);
+                    String mMinute = tmp.substring(13, 15);
+                    String mSecond = tmp.substring(15, 17);
+                    mVariable.add(new GetSet("카테고리:" + result[0],
+                            "파일이름 : " + "[" + result[0] + "]" + result[1],
+                            "날짜:" + mDate + mHour + "시" + mMinute + "분" + mSecond + "초"));
 
+                }
             }
         }
 

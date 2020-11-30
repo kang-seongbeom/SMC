@@ -239,7 +239,7 @@ public class ImageAndTextView extends AppCompatActivity {
 
                             //화면을 키우다 보면 화질이 나빠지기 때문에
                             //비트맵으로 디코딩 몫의 숫자를 작게하면 너무 끊김김
-                           if(currentHeight%150==0)
+                           if(currentHeight%10==0)
                                 //savedImage.setImageBitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),0));
                                if (path != null) {
                                    File mfile = new File(path + "/" + "image.jpg");

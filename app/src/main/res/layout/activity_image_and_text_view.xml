@@ -33,6 +33,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
             android:layout_marginTop="10dp"
+            android:padding="10dp"
             android:background="@drawable/stroke"/>
         <ImageView
             android:id="@+id/reSizeHeight"
@@ -48,6 +49,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
             android:layout_marginTop="10dp"
+            android:padding="10dp"
             android:background="@drawable/stroke"/>
     </LinearLayout>
     <LinearLayout
@@ -58,25 +60,50 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
-        <ImageView
-            android:id="@+id/imageRotate"
-            android:text="회전"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:src="@drawable/ic_baseline_rotate_90_degrees_ccw_24"
-            android:layout_marginEnd="20dp"/>
 
-        <ImageView
-            android:id="@+id/ttsButton"
-            android:text="회전"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:src="@drawable/ic_baseline_graphic_eq_24"
-            android:layout_marginEnd="20dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginEnd="20dp">
+            <ImageView
+                android:id="@+id/imageRotate"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_rotate_90_degrees_ccw_24" />
+            <TextView
+                android:text="사진 회전"
+                android:textSize="13dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginEnd="20dp">
+            <ImageView
+                android:id="@+id/ttsButton"
+
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@drawable/ic_baseline_graphic_eq_24" />
+            <TextView
+                android:text="텍스트 읽기"
+                android:textSize="13dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
 
 
 

@@ -47,6 +47,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="10dp"
+        android:padding="10dp"
         android:background="@drawable/stroke"/>
     <TextView
         android:id="@+id/ocrImageToText"
@@ -56,6 +57,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="10dp"
+        android:padding="10dp"
         android:background="@drawable/stroke"/>
 
 
@@ -63,12 +65,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <LinearLayout
             android:id="@+id/firstConstraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="4dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="40dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="10dp"
@@ -76,23 +77,44 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="0dp">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_marginEnd="20dp">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/getImageButton"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_baseline_image_search_24" />
+                <TextView
+                    android:text="이미지 불러오기"
+                    android:textSize="13dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/getImageButton"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginEnd="20dp"
-                android:clickable="true"
-                android:src="@drawable/ic_baseline_image_search_24" />
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="20dp">
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/captureButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-
-                android:layout_marginStart="20dp"
                 android:clickable="true"
                 android:src="@drawable/ic_baseline_photo_camera_24" />
+            <TextView
+                android:text="카메라"
+                android:textSize="13dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
 
         </LinearLayout>
@@ -100,8 +122,8 @@
         <LinearLayout
             android:id="@+id/secondConstraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="52dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="10dp"
@@ -109,28 +131,62 @@
             android:visibility="invisible"
             tools:layout_editor_absoluteX="0dp">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ocrStartButton"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:clickable="true"
-                android:src="@drawable/ic_baseline_g_translate_24" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ocrStartButton"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_baseline_g_translate_24" />
+                <TextView
+                    android:text="텍스트 추출"
+                    android:textSize="13dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ttsStartButton"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:clickable="true"
-                android:src="@drawable/ic_baseline_graphic_eq_24" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ttsStartButton"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_baseline_graphic_eq_24" />
+                <TextView
+                    android:text="텍스트 읽기"
+                    android:textSize="13dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/saveButton"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:clickable="true"
-                android:src="@drawable/ic_baseline_stop_24" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/saveButton"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_baseline_stop_24" />
+                <TextView
+                    android:text="저장하기"
+                    android:textSize="13dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
