@@ -7,6 +7,8 @@ public class GetSet {
     String name,date;
     private String mCategory;
 
+    private int mChecked;
+
     public GetSet(){
     }
 
@@ -14,6 +16,7 @@ public class GetSet {
         this.mCategory=category;
         this.name=name;
         this.date=date;
+        this.mChecked = 0;
     }
 
     public String getName() {
@@ -55,4 +58,8 @@ public class GetSet {
     public void setmCategory(String mCategory) {
         this.mCategory = mCategory;
     }
+
+    public int getChecked() { return mChecked; }
+
+    public void setChecked(int checked) { this.mChecked = checked; }
 }

@@ -94,6 +94,7 @@ public class ImageAndTextView extends AppCompatActivity {
 
         Intent intent = getIntent();
         path = intent.getStringExtra("paths");
+        Log.d("path",path);
         if (path != null) {
             File imgFile = new  File(path + "/" + "image.jpg");
             if(imgFile.exists()){

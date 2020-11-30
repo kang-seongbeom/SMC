@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -16,17 +17,21 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +47,10 @@ public class FileView extends AppCompatActivity {
     private ArrayList<GetSet> mVariable = new ArrayList<>();
     private File[] mFiles;
 
+    //checkBox
+    private int mModifyFlag;
+    private int mChecked;
+
     private final String sharedPreferenceKey = "saveArrayListToSharedPreference";
     private ArrayList<String> filesCategoryList = new ArrayList<>();
 
@@ -56,6 +65,11 @@ public class FileView extends AppCompatActivity {
 
         mAdapter = new CustomAdapter(mVariable);
         mRecyclerView.setAdapter(mAdapter);
+
+        //checkBox관련
+        final BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        final CheckBox check_all = findViewById(R.id.check_all);
+        mModifyFlag = 0;
 
         //actionbar
         androidx.appcompat.widget.Toolbar toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
@@ -73,16 +87,28 @@ public class FileView extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
                 //파일값 넘기기
-                Intent intent = new Intent(getApplicationContext(), ImageAndTextView.class);
-                intent.putExtra("filesNameList", filesNameList.get(position));
-                intent.putExtra("filesDateList", filesDateList.get(position));
-                intent.putExtra("paths", mFiles[position].getPath());
-                startActivity(intent);
+                if (mModifyFlag == 0) {
+                    Intent intent = new Intent(getApplicationContext(), ImageAndTextView.class);
+                    intent.putExtra("filesNameList", filesNameList.get(position));
+                    intent.putExtra("filesDateList", filesDateList.get(position));
+                    intent.putExtra("paths", mFiles[position+2].getPath());
+                    startActivity(intent);
+                }else{
+                    mChecked = mVariable.get(position).getChecked();
+                    if (mChecked == 0)
+                        mVariable.get(position).setChecked(1);
+                    else
+                        mVariable.get(position).setChecked(0);
+
+                    mAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
             public void onLongClick(View view, int position) {
-
+                mModifyFlag = 1;
+                handleVisible(mModifyFlag);
+                mAdapter.notifyDataSetChanged();
             }
         }));
 
@@ -229,6 +255,68 @@ public class FileView extends AppCompatActivity {
                 mDeleteCategoryAlertDialogofFileView.show();
             }
         });
+
+
+        //bottomnavigationview의 아이콘을 선택 했을때 기능 설정
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    //삭제
+                    case R.id.delete_tab: {
+                        int size=mFiles.length;
+                        int a=0;
+                        for (int pos=0;pos<size;pos++){
+                            if(mVariable.get(pos).getChecked()==1) {
+                                //하위파일까지 삭제하는 메서드
+                                if(mVariable.get(pos).getName().equals("generatefid.lock") ||
+                                        mVariable.get(pos).getName().equals("PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json")) {
+                                    a++;
+                                    continue;
+                                }
+                                setDirEmpty(mFiles[pos+a].getPath());
+                            }
+                        }
+
+                        mModifyFlag = 0;
+                        handleVisible(mModifyFlag);
+                        mAdapter.notifyDataSetChanged();
+
+                        //notifycation이 안먹혀서 임시방편으로 화면 초기화
+                        Intent mRestartIntent = getIntent();
+                        finish();
+                        startActivity(mRestartIntent);
+
+                        return true;
+                    }
+
+                    //하단 바 내리기
+                    case R.id.close_tab: {
+                        mModifyFlag = 0;
+                        handleVisible(mModifyFlag);
+                        mAdapter.notifyDataSetChanged();
+                        return true;
+                    }
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        //전체선택
+        check_all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int checked;
+                int count = mAdapter.getItemCount();
+                if (check_all.isChecked()==true) checked=1;
+                else checked=0;
+                for (int pos=0;pos<count;pos++){
+                    mVariable.get(pos).setChecked(checked);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     //뒤로가기버튼 활성화
@@ -241,6 +329,31 @@ public class FileView extends AppCompatActivity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //하단 바 표시 여부 modify_flag=0 Gone, modify_flag=1 Visible
+    public void handleBottomNavVisible(int modify_flag) {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        if (modify_flag == 1) bottomNavigationView.setVisibility(View.VISIBLE);
+        else bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    //하단 바 표시 여부 어댑터에 전달
+    public void handleCheckBoxVisible(int n) {
+        mAdapter.checkBoxVisibility(n);
+    }
+
+    //전체선택 표시 여부
+    public void handleCheckedAllVisible(int modify_flag) {
+        CheckBox check_all = findViewById(R.id.check_all);
+        if(modify_flag==0) check_all.setVisibility(View.GONE);
+        else check_all.setVisibility(View.VISIBLE);
+    }
+
+    public void handleVisible(int modify_flag) {
+        handleCheckBoxVisible(modify_flag);
+        handleCheckedAllVisible(modify_flag);
+        handleBottomNavVisible(modify_flag);
     }
 
     //파일 검색 icon
@@ -298,46 +411,6 @@ public class FileView extends AppCompatActivity {
         void onLongClick(View view, int position);
     }
 
-    public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
-
-        private GestureDetector gestureDetector;
-        private FileView.ClickListener clickListener;
-
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final FileView.ClickListener clickListener) {
-            this.clickListener = clickListener;
-            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-                    if (child != null && clickListener != null) {
-                        clickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
-                    }
-                }
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child, rv.getChildAdapterPosition(child));
-            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        }
-    }
 
     private void setStringArrayPref(Context context, String key, ArrayList<String> values) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -371,5 +444,14 @@ public class FileView extends AppCompatActivity {
             }
         }
         return urls;
+    }
+
+    public void setDirEmpty(String path){
+        File dir = new File(path);
+        File image = new File(path+"/"+"image.jpg");
+        File text = new File(path+"/"+"TTStext.txt");
+        text.delete();
+        image.delete();
+        dir.delete();
     }
 }
