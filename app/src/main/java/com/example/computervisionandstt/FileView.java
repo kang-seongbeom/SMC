@@ -265,16 +265,13 @@ public class FileView extends AppCompatActivity {
                     //삭제
                     case R.id.delete_tab: {
                         int size=mFiles.length;
-                        int a=0;
-                        for (int pos=0;pos<size;pos++){
-                            if(mVariable.get(pos).getChecked()==1) {
-                                //하위파일까지 삭제하는 메서드
-                                if(mVariable.get(pos).getName().equals("generatefid.lock") ||
-                                        mVariable.get(pos).getName().equals("PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json")) {
-                                    a++;
-                                    continue;
-                                }
-                                setDirEmpty(mFiles[pos+a].getPath());
+                        int count=0;
+                        Log.d("position",size+"");
+                        for (int pos=0;pos<size-2;pos++){
+                            Log.d("position",pos+"");
+                            if((mVariable.get(pos).getChecked()==1) &&
+                                    ((!mVariable.get(pos).getName().equals("generatefid.lock")) || (!mVariable.get(pos).getName().equals("PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json")))) {
+                                setDirEmpty(mFiles[pos+count].getPath());
                             }
                         }
 
@@ -309,7 +306,7 @@ public class FileView extends AppCompatActivity {
             public void onClick(View view) {
                 int checked;
                 int count = mAdapter.getItemCount();
-                if (check_all.isChecked()==true) checked=1;
+                if (check_all.isChecked()) checked=1;
                 else checked=0;
                 for (int pos=0;pos<count;pos++){
                     mVariable.get(pos).setChecked(checked);
