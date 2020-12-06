@@ -6,13 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -271,7 +268,7 @@ public class FileView extends AppCompatActivity {
                             Log.d("position",pos+"");
                             if((mVariable.get(pos).getChecked()==1) &&
                                     ((!mVariable.get(pos).getName().equals("generatefid.lock")) || (!mVariable.get(pos).getName().equals("PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json")))) {
-                                setDirEmpty(mFiles[pos+count].getPath());
+                                setDiretoryEmpty(mFiles[pos+count].getPath());
                             }
                         }
 
@@ -443,12 +440,13 @@ public class FileView extends AppCompatActivity {
         return urls;
     }
 
-    public void setDirEmpty(String path){
+    public void setDiretoryEmpty(String path){
         File dir = new File(path);
         File image = new File(path+"/"+"image.jpg");
         File text = new File(path+"/"+"TTStext.txt");
         text.delete();
         image.delete();
         dir.delete();
+
     }
 }
