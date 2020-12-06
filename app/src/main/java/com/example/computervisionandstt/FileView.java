@@ -38,8 +38,6 @@ import java.util.ArrayList;
 
 public class FileView extends AppCompatActivity {
     private CustomAdapter mAdapter;
-    private ArrayList<String> filesNameList = new ArrayList<>();
-    private ArrayList<String> filesDateList = new ArrayList<>();
     private ArrayList<String> mCategotyList;
     private ArrayList<GetSet> mVariable = new ArrayList<>();
     private File[] mFiles;
@@ -86,9 +84,7 @@ public class FileView extends AppCompatActivity {
                 //파일값 넘기기
                 if (mModifyFlag == 0) {
                     Intent intent = new Intent(getApplicationContext(), ImageAndTextView.class);
-                    intent.putExtra("filesNameList", filesNameList.get(position));
-                    intent.putExtra("filesDateList", filesDateList.get(position));
-                    intent.putExtra("paths", mFiles[position+2].getPath());
+                    intent.putExtra("paths", mFiles[position].getPath());
                     startActivity(intent);
                 }else{
                     mChecked = mVariable.get(position).getChecked();
@@ -96,7 +92,6 @@ public class FileView extends AppCompatActivity {
                         mVariable.get(position).setChecked(1);
                     else
                         mVariable.get(position).setChecked(0);
-
                     mAdapter.notifyDataSetChanged();
                 }
             }
@@ -123,8 +118,6 @@ public class FileView extends AppCompatActivity {
                 }else{
                     String[] result = name.split("#");
                     filesCategoryList.add(result[0]);
-                    filesNameList.add(result[1]);
-                    filesDateList.add(result[2]);
                     String tmp = result[2];
                     String mDate = tmp.substring(0, 11);
                     String mHour = tmp.substring(11, 13);
@@ -264,12 +257,9 @@ public class FileView extends AppCompatActivity {
                         int size=mFiles.length;
                         int count=0;
                         Log.d("position",size+"");
-                        for (int pos=0;pos<size-2;pos++){
-                            Log.d("position",pos+"");
-                            if((mVariable.get(pos).getChecked()==1) &&
-                                    ((!mVariable.get(pos).getName().equals("generatefid.lock")) || (!mVariable.get(pos).getName().equals("PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json")))) {
-                                setDiretoryEmpty(mFiles[pos+count].getPath());
-                            }
+                        for (int pos=0;pos<size;pos++){
+                            setDiretoryEmpty(context.getFilesDir().toString(),mFiles[pos+count].getPath());
+
                         }
 
                         mModifyFlag = 0;
@@ -440,13 +430,21 @@ public class FileView extends AppCompatActivity {
         return urls;
     }
 
-    public void setDiretoryEmpty(String path){
+    public int setDiretoryEmpty(String highPath,String path){
         File dir = new File(path);
-        File image = new File(path+"/"+"image.jpg");
-        File text = new File(path+"/"+"TTStext.txt");
-        text.delete();
-        image.delete();
-        dir.delete();
-
+        if(dir.exists()) {
+            if((path.equals(highPath+"generatefid.lock")) ||
+                    (path.equals(highPath+"PersistedInstallation.W0RFRkFVTFRd+MToyMzc3MTEzNDM4MzM6YW5kcm9pZDo2NDdhYjM4Yzc2YzE4MjFlNTRiZWM4.json"))){
+                return 0;
+            }else{
+                File image = new File(path + "/" + "image.jpg");
+                File text = new File(path + "/" + "TTStext.txt");
+                text.delete();
+                image.delete();
+                dir.delete();
+                return 1;
+            }
+        }
+        return -1;
     }
 }

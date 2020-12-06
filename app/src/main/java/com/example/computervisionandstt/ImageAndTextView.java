@@ -8,38 +8,29 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.method.ScrollingMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-
-import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,7 +46,7 @@ public class ImageAndTextView extends AppCompatActivity {
     private TextView savedText;
 
     private int degree=0;
-    private String path;
+    private String getPath;
     SubsamplingScaleImageView savedImage;
     private TextToSpeech textToSpeech;
 
@@ -93,16 +84,19 @@ public class ImageAndTextView extends AppCompatActivity {
         savedText.setMovementMethod(new ScrollingMovementMethod());
 
         Intent intent = getIntent();
-        path = intent.getStringExtra("paths");
-        Log.d("path",path);
-        if (path != null) {
-            File imgFile = new  File(path + "/" + "image.jpg");
-            if(imgFile.exists()){
-                Bitmap mBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                savedImage.setImage(ImageSource.bitmap(mBitmap));
+        getPath = intent.getStringExtra("paths");
+        Log.d("path", getPath);
+        if (getPath != null) {
+            File currentFile=new File(getPath);
+            if(currentFile.isDirectory() && currentFile.exists()) {
+                File imgFile = new File(getPath + "/" + "image.jpg");
+                if (imgFile.exists()) {
+                    Bitmap mBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                    savedImage.setImage(ImageSource.bitmap(mBitmap));
+                }
+                //Glide.with(this).load(path + "/" + "image.jpg").into(R.drawable.ic_baseline_remove_24);
+                savedText.setText(ReadTextFile(getPath + "/" + "TTStext.txt"));
             }
-            //Glide.with(this).load(path + "/" + "image.jpg").into(R.drawable.ic_baseline_remove_24);
-            savedText.setText(ReadTextFile(path + "/" + "TTStext.txt"));
         } else {
             Log.d("pathing", "nope");
         }
@@ -193,10 +187,10 @@ public class ImageAndTextView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 degree+=90;
-                if (path != null) {
-                    File mfile = new File(path + "/" + "image.jpg");
+                if (getPath != null) {
+                    File mfile = new File(getPath + "/" + "image.jpg");
                     if (mfile.exists()) {
-                        savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree)));
+                        savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(getPath + "/" + "image.jpg"),degree)));
                     }
                 }
             }
@@ -242,10 +236,10 @@ public class ImageAndTextView extends AppCompatActivity {
                             //비트맵으로 디코딩 몫의 숫자를 작게하면 너무 끊김김
                            if(currentHeight%10==0)
                                 //savedImage.setImageBitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),0));
-                               if (path != null) {
-                                   File mfile = new File(path + "/" + "image.jpg");
+                               if (getPath != null) {
+                                   File mfile = new File(getPath + "/" + "image.jpg");
                                    if (mfile.exists()) {
-                                       savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(path + "/" + "image.jpg"),degree)));
+                                       savedImage.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(getPath + "/" + "image.jpg"),degree)));
                                    }
                                }
 
