@@ -6,17 +6,19 @@ public class GetSet {
     //recyclerview를 위한 getset
     String name,date;
     private String mCategory;
+    private String mFilePath;
 
     private int mChecked;
 
     public GetSet(){
     }
 
-    public GetSet(String category,String name,String date){
+    public GetSet(String category,String name,String date, String path){
         this.mCategory=category;
         this.name=name;
         this.date=date;
         this.mChecked = 0;
+        this.mFilePath=path;
     }
 
     public String getName() {
@@ -62,4 +64,8 @@ public class GetSet {
     public int getChecked() { return mChecked; }
 
     public void setChecked(int checked) { this.mChecked = checked; }
+
+    public String getmFilePath() { return mFilePath; }
+
+    public void setmFilePath(String mFilePath) { this.mFilePath = mFilePath; }
 }

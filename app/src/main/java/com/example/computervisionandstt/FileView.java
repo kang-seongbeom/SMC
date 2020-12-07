@@ -84,7 +84,7 @@ public class FileView extends AppCompatActivity {
                 //파일값 넘기기
                 if (mModifyFlag == 0) {
                     Intent intent = new Intent(getApplicationContext(), ImageAndTextView.class);
-                    intent.putExtra("paths", mFiles[position].getPath());
+                    intent.putExtra("paths", mVariable.get(position).getmFilePath());
                     startActivity(intent);
                 }else{
                     mChecked = mVariable.get(position).getChecked();
@@ -125,7 +125,7 @@ public class FileView extends AppCompatActivity {
                     String mSecond = tmp.substring(15, 17);
                     mVariable.add(new GetSet("카테고리:" + result[0],
                             "파일이름 : " + "[" + result[0] + "]" + result[1],
-                            "날짜:" + mDate + mHour + "시" + mMinute + "분" + mSecond + "초"));
+                            "날짜:" + mDate + mHour + "시" + mMinute + "분" + mSecond + "초",mFiles[i].getPath()));
 
                 }
             }
@@ -254,14 +254,12 @@ public class FileView extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     //삭제
                     case R.id.delete_tab: {
-                        int size=mFiles.length;
-                        int count=0;
-                        Log.d("position",size+"");
+                        int size=mVariable.size();
                         for (int pos=0;pos<size;pos++){
-                            setDiretoryEmpty(context.getFilesDir().toString(),mFiles[pos+count].getPath());
-
+                            if(mVariable.get(pos).getChecked()==1){
+                                setDiretoryEmpty(context.getFilesDir().toString(),mVariable.get(pos).getmFilePath());
+                            }
                         }
-
                         mModifyFlag = 0;
                         handleVisible(mModifyFlag);
                         mAdapter.notifyDataSetChanged();
