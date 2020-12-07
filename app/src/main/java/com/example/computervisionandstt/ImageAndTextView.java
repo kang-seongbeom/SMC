@@ -23,6 +23,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -76,6 +78,7 @@ public class ImageAndTextView extends AppCompatActivity {
         savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
+        ImageView searchWord=findViewById(R.id.searchWord);
         ImageView ttsButton = findViewById(R.id.ttsButton);
         ImageView roateButton=findViewById(R.id.imageRotate);
         LinearLayout linearView = findViewById(R.id.linearView);
@@ -286,6 +289,31 @@ public class ImageAndTextView extends AppCompatActivity {
 
                 return false;
             }
+        });
+
+        searchWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder mCategoryAlert = new AlertDialog.Builder(ImageAndTextView.this);
+                EditText addCategoryEditText = new EditText(ImageAndTextView.this);
+                mCategoryAlert.setMessage("카테고리 이름");
+                mCategoryAlert.setView(addCategoryEditText);
+                mCategoryAlert.setPositiveButton("검색", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //카테고리배열에 카테고리정보를 불러옴
+
+                    }
+                });
+                mCategoryAlert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                AlertDialog mCategoryAlertDialog = mCategoryAlert.create();
+                mCategoryAlertDialog.show();
+            }
+            
         });
 
     }
