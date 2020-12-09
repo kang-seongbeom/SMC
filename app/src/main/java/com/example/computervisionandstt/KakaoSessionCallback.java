@@ -87,7 +87,7 @@ public class KakaoSessionCallback implements ISessionCallback {
                             }
 
                             if(context!=null){
-                                Intent intent=new Intent(context,Ocr.class);
+                                Intent intent=new Intent(context,SelectMode.class);
                                 context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                                 Login login=(Login) Login.loginActivity;
                                 login.finish();

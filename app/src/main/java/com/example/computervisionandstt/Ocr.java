@@ -2,8 +2,11 @@ package com.example.computervisionandstt;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -33,6 +36,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -45,8 +49,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.microsoft.projectoxford.vision.VisionServiceRestClient;
 import com.microsoft.projectoxford.vision.contract.LanguageCodes;
@@ -96,10 +102,11 @@ public class Ocr extends AppCompatActivity {
     private ArrayList<String> mCategoryArrayList;
     private final String sharedPreferenceKey="saveArrayListToSharedPreference";
 
-    //뒤로가기2번 눌르면 앱종료
-    private BackPressCloseHandler backPressCloseHandler;
 
 
+    private DrawerLayout mDrawerLayout;
+
+    //tts속도, 음높이 조절
     private float ttsPitch=(float)50.0;
     private float ttsSpeed=(float)100.0;
 
@@ -119,7 +126,6 @@ public class Ocr extends AppCompatActivity {
         ocrImageToText.setMovementMethod(new ScrollingMovementMethod());
 
         //버튼
-        LinearLayout toFileView = findViewById(R.id.toFileView);
         ImageView settingImage = findViewById(R.id.settingImage);
         ImageView getImageButton = findViewById(R.id.getImageButton);
         ImageView captureButton = findViewById(R.id.captureButton);
@@ -140,12 +146,41 @@ public class Ocr extends AppCompatActivity {
         mCategoryArrayList.set(0, "기본 카테고리");
         setStringArrayPref(mContext, sharedPreferenceKey, mCategoryArrayList);
 
-        //toFileView
-        toFileView.setOnClickListener(new View.OnClickListener() {
+        //메뉴
+        NavigationView mNavigationViewing = (NavigationView) findViewById(R.id.nav_view);
+        View mHeaderView = mNavigationViewing.getHeaderView(0);
+        ImageView mVaviUserImage = mHeaderView.findViewById(R.id.navi_user_image);
+        Glide.with(this).load(R.drawable.smartphone).into(mVaviUserImage);
+
+        //actionbar
+        androidx.appcompat.widget.Toolbar mToolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setDisplayShowTitleEnabled(false); // 기존 title 지우기
+        mActionBar.setDisplayHomeAsUpEnabled(true); // 메뉴 버튼 만들기
+        mActionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24); //메뉴 버튼 이미지 지정
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), FileView.class);
-                startActivity(intent);
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                mDrawerLayout.closeDrawers();
+                int id = menuItem.getItemId();
+                //계정정보로 이동
+                if(id == R.id.account){
+                    Intent intent=new Intent(getApplicationContext(),UserAccount.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+                //FileView로 가기
+                else if(id == R.id.toFileView) {
+                    Intent intent=new Intent(getApplicationContext(),FileView.class);
+                    startActivity(intent);
+                }
+                return true;
             }
         });
 
@@ -352,8 +387,6 @@ public class Ocr extends AppCompatActivity {
             }
         });
 
-        //뒤로가기2번 누르면 종료
-        backPressCloseHandler = new BackPressCloseHandler(this);
     }
 
 
@@ -920,10 +953,16 @@ public class Ocr extends AppCompatActivity {
         return urls;
     }
 
+    //메뉴 버튼 눌렀을 시
     @Override
-    public void onBackPressed() {
-        //super.onBackPressed();
-        backPressCloseHandler.onBackPressed();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ // 왼쪽 상단 버튼 눌렀을 때
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 

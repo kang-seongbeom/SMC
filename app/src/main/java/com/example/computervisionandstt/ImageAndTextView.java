@@ -1,10 +1,14 @@
 package com.example.computervisionandstt;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.exifinterface.media.ExifInterface;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +25,7 @@ import android.speech.tts.UtteranceProgressListener;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -31,8 +37,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -68,6 +76,8 @@ public class ImageAndTextView extends AppCompatActivity {
     private float ttsPitch=(float)50.0;
     private float ttsSpeed=(float)100.0;
 
+    private DrawerLayout mDrawerLayout;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +86,7 @@ public class ImageAndTextView extends AppCompatActivity {
 
         ImageView settingImage=findViewById(R.id.settingImage);
         savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
+        ImageView toOnlyText=findViewById(R.id.toOnlyText);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
         ImageView searchWord=findViewById(R.id.searchWord);
@@ -86,6 +97,7 @@ public class ImageAndTextView extends AppCompatActivity {
         //스크롤
         savedText.setMovementMethod(new ScrollingMovementMethod());
 
+        //값 받아서 셋팅
         Intent intent = getIntent();
         getPath = intent.getStringExtra("paths");
         Log.d("path", getPath);
@@ -104,7 +116,54 @@ public class ImageAndTextView extends AppCompatActivity {
             Log.d("pathing", "nope");
         }
 
-        //setting
+        //메뉴
+        NavigationView mNavigationViewing = (NavigationView) findViewById(R.id.nav_view);
+        View mHeaderView = mNavigationViewing.getHeaderView(0);
+        ImageView mVaviUserImage = mHeaderView.findViewById(R.id.navi_user_image);
+        Glide.with(this).load(R.drawable.smartphone).into(mVaviUserImage);
+
+        //actionbar
+        androidx.appcompat.widget.Toolbar mToolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setDisplayShowTitleEnabled(false); // 기존 title 지우기
+        mActionBar.setDisplayHomeAsUpEnabled(true); // 메뉴 버튼 만들기
+        mActionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24); //메뉴 버튼 이미지 지정
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                mDrawerLayout.closeDrawers();
+                int id = menuItem.getItemId();
+                //계정정보로 이동
+                if(id == R.id.account){
+                    Intent intent=new Intent(getApplicationContext(),UserAccount.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+                //FileView로 가기
+                else if(id == R.id.toFileView) {
+                    finish();
+                }
+                return true;
+            }
+        });
+
+        toOnlyText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toTheOnlyText=new Intent(ImageAndTextView.this,OnlyText.class);
+                if(getPath!=null)
+                    toTheOnlyText.putExtra("folderPath",getPath);
+                startActivity(toTheOnlyText);
+            }
+        });
+
         //setting
         settingImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -295,13 +354,17 @@ public class ImageAndTextView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder mCategoryAlert = new AlertDialog.Builder(ImageAndTextView.this);
-                EditText addCategoryEditText = new EditText(ImageAndTextView.this);
-                mCategoryAlert.setMessage("카테고리 이름");
-                mCategoryAlert.setView(addCategoryEditText);
+                EditText searchWordEdit = new EditText(ImageAndTextView.this);
+                mCategoryAlert.setMessage("단어 검색");
+                mCategoryAlert.setView(searchWordEdit);
                 mCategoryAlert.setPositiveButton("검색", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //카테고리배열에 카테고리정보를 불러옴
+                        Log.d("searchWordEdit.getText()",searchWordEdit.getText().toString());
+                        Intent webSearchIntent=new Intent();
+                        webSearchIntent.setAction(Intent.ACTION_WEB_SEARCH);
+                        webSearchIntent.putExtra(SearchManager.QUERY,searchWordEdit.getText().toString());
+                        startActivity(webSearchIntent);
 
                     }
                 });
@@ -316,7 +379,9 @@ public class ImageAndTextView extends AppCompatActivity {
             
         });
 
+
     }
+
 
     //경로의 텍스트 파일읽기
     private String ReadTextFile(String path) {
@@ -509,5 +574,16 @@ public class ImageAndTextView extends AppCompatActivity {
             textToSpeech.speak(charSequence,TextToSpeech.QUEUE_FLUSH,null,"id1");
         }else
             Toast.makeText(getApplicationContext(),"이미지 분석을 해주세요!",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ // 왼쪽 상단 버튼 눌렀을 때
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

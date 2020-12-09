@@ -171,7 +171,7 @@ public class Login extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intent= new Intent(getApplicationContext(), Ocr.class);
+                            Intent intent= new Intent(getApplicationContext(), SelectMode.class);
                             startActivity(intent);
                             finish();
                         } else {
@@ -230,7 +230,7 @@ public class Login extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()) {
                             finish();
-                            startActivity(new Intent(getApplicationContext(), Ocr.class));
+                            startActivity(new Intent(getApplicationContext(), SelectMode.class));
                         } else {
                             Log.d("LoginError",task.getException()+"");
                             Toast.makeText(getApplicationContext(), "로그인 실패!", Toast.LENGTH_LONG).show();
