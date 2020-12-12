@@ -14,11 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeNoTitle">
 
+
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
-
-        <activity android:name=".OnlyText"/>
+        <activity android:name=".OnlyImage"/>
+        <activity android:name=".OnlyText" />
         <activity android:name=".SelectMode" />
         <activity android:name=".UserAccount" />
         <activity android:name=".Login" />

@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
 
-                android:text="텍스트만 보기" />
+                android:text="이미지만 보기" />
         </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
@@ -32,42 +32,51 @@
             android:orientation="vertical"
             android:screenOrientation="portrait">
 
-            <TextView
-                android:id="@+id/setText"
+            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+                android:id="@+id/onlyImageResize"
                 android:layout_width="350dp"
                 android:layout_height="550dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/custom_textviwe"
-                android:bufferType="spannable"
-                android:padding="5dp"
-                android:textSize="20dp" />
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/stroke"
+                android:padding="10dp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_alignParentBottom="true"
-            android:orientation="vertical">
-            <TextView
-                android:text="글자크기 변경"
-                android:layout_marginStart="20dp"
-                android:textSize="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <SeekBar
-                android:id="@+id/textResizeSeekbar"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"
-                android:min="5"
-                android:padding="10dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="10dp">
 
-                />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/onlyImageRotate"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:clickable="true"
+                        android:src="@drawable/ic_baseline_rotate_90_degrees_ccw_24" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="사진 회전"
+                        android:textSize="13dp" />
+                </LinearLayout>
+
+
+            </LinearLayout>
 
         </LinearLayout>
-
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView

@@ -57,7 +57,7 @@ public class ImageAndTextView extends AppCompatActivity {
 
     private int degree=0;
     private String getPath;
-    SubsamplingScaleImageView savedImage;
+    private SubsamplingScaleImageView savedImage;
     private TextToSpeech textToSpeech;
 
     // 시작 위치를 저장을 위한 변수
@@ -87,6 +87,7 @@ public class ImageAndTextView extends AppCompatActivity {
         ImageView settingImage=findViewById(R.id.settingImage);
         savedImage =(SubsamplingScaleImageView) findViewById(R.id.savedImage);
         ImageView toOnlyText=findViewById(R.id.toOnlyText);
+        ImageView toOnlyImage=findViewById(R.id.toOnlyImage);
         ImageView reSizeHeight = findViewById(R.id.reSizeHeight);
         savedText = findViewById(R.id.savedText);
         ImageView searchWord=findViewById(R.id.searchWord);
@@ -154,10 +155,21 @@ public class ImageAndTextView extends AppCompatActivity {
             }
         });
 
+        toOnlyImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toTheOnlyImage=new Intent(getApplicationContext(),OnlyImage.class);
+                if(getPath!=null)
+                    toTheOnlyImage.putExtra("folderPath",getPath);
+                startActivity(toTheOnlyImage);
+            }
+        });
+
         toOnlyText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toTheOnlyText=new Intent(ImageAndTextView.this,OnlyText.class);
+
+                Intent toTheOnlyText=new Intent(getApplicationContext(),OnlyText.class);
                 if(getPath!=null)
                     toTheOnlyText.putExtra("folderPath",getPath);
                 startActivity(toTheOnlyText);

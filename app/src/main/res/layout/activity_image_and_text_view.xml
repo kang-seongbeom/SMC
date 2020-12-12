@@ -32,6 +32,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end">
+                <ImageView
+                    android:id="@+id/toOnlyImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/ic_baseline_image_24"
+                    android:clickable="true"/>
 
                 <ImageView
                     android:id="@+id/toOnlyText"

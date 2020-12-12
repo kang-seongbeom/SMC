@@ -6,17 +6,21 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.BufferedReader;
@@ -26,15 +30,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class OnlyText extends AppCompatActivity {
+public class OnlyImage extends AppCompatActivity {
 
+    private SubsamplingScaleImageView onlyImageResize;
     private DrawerLayout mDrawerLayout;
+    private int degree=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_only_text);
+        setContentView(R.layout.activity_only_image);
 
+        //기본 화면 셋팅
         //메뉴
         NavigationView mNavigationViewing = (NavigationView) findViewById(R.id.nav_view);
         View mHeaderView = mNavigationViewing.getHeaderView(0);
@@ -72,32 +79,32 @@ public class OnlyText extends AppCompatActivity {
                 return true;
             }
         });
+        //기본화면 셋팅 끝
+
+        onlyImageResize =(SubsamplingScaleImageView) findViewById(R.id.onlyImageResize);
 
         Intent intent=getIntent();
         String getPath=intent.getStringExtra("folderPath");
 
-        TextView setText=findViewById(R.id.setText);
-        File checkExitText=new File(getPath+"/"+"TTStext.txt");
-        if(checkExitText.exists())
-            setText.setText(ReadTextFile(getPath+"/"+"TTStext.txt"));
+        Log.d("getPath",getPath);
 
-        SeekBar textResizeSeekbar=findViewById(R.id.textResizeSeekbar);
-        textResizeSeekbar.setProgress((int)setText.getTextSize());
-        textResizeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        File checkExitImage=new File(getPath+"/"+"image.jpg");
+        if(checkExitImage.exists()) {
+            onlyImageResize.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(getPath + "/" + "image.jpg"),degree)));
+        }
+
+
+        ImageView onlyImageRotate=findViewById(R.id.onlyImageRotate);
+        onlyImageRotate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //tmpPitch[0]=progress;
-                setText.setTextSize((float)progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void onClick(View v) {
+                degree+=90;
+                if (getPath != null) {
+                    File mfile = new File(getPath + "/" + "image.jpg");
+                    if (mfile.exists()) {
+                        onlyImageResize.setImage(ImageSource.bitmap(rotateImage(BitmapFactory.decodeFile(getPath + "/" + "image.jpg"),degree)));
+                    }
+                }
             }
         });
 
@@ -113,22 +120,9 @@ public class OnlyText extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    //경로의 텍스트 파일읽기
-    private String ReadTextFile(String path) {
-        StringBuffer strBuffer = new StringBuffer();
-        try {
-            InputStream is = new FileInputStream(path);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                strBuffer.append(line + "\n");
-            }
-            reader.close();
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-        return strBuffer.toString();
+    private Bitmap rotateImage(Bitmap bitmap,float degree){
+        Matrix matrix=new Matrix();
+        matrix.postRotate(degree);
+        return Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
     }
 }
